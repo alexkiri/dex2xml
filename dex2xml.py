@@ -88,11 +88,10 @@ import pymysql
 # VERSION
 VERSION = "0.9.1"
 
-source_list = [
-    '7', '22', '26', '12', '57',
-    '35', '24', '21', '19', '27']
+source_list = ['22', '23', '26', '27', '36', '21', '35']
 source_list_names = []
 source_list_count = []
+inflection_map = {}
 
 mysql_server = ''
 mysql_port = ''
@@ -292,6 +291,9 @@ WHERE d.id = %s
         for i in range(cur2.rowcount):
             inf = cur2.fetchone()
             inflection = inf["inflection"]
+            if inflection_map.get(inflection):
+                continue
+            inflection_map[inflection] = True
             if isWithComma(inflection):
                 if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
                     inflections.append(replaceWithCedilla(inflection))
@@ -373,7 +375,7 @@ WHERE s.id IN (%s)
     AND d.lexicon <> ''
     AND d.status = 0
 ORDER BY d.lexicon ASC,
-         s.id DESC""" % ', '.join(source_list))
+         s.year DESC""" % ', '.join(source_list))
 
     if cur.rowcount == 0:
         print("Managed to retrieve 0 definitions from dictionary...\nSomething was wrong...")
