@@ -279,8 +279,8 @@ def inflectionsList(iddef):
     cur2.execute("""
 SELECT DISTINCT inf.formUtf8General AS inflection
 FROM InflectedForm AS inf
-JOIN Lexem l ON inf.lexemId = l.id
-JOIN EntryLexem el ON el.lexemId = l.id
+JOIN Lexeme l ON inf.lexemeId = l.id
+JOIN EntryLexeme el ON el.lexemeId = l.id
 JOIN Entry e ON el.entryId = e.id
 JOIN EntryDefinition ed ON ed.entryId = e.id
 JOIN Definition d ON ed.definitionId = d.id
@@ -367,7 +367,7 @@ def exportDictionaryFiles():
     cur.execute("""
 SELECT d.id,
        d.lexicon,
-       replace(d.htmlRep, '\n', '') AS htmlRep,
+       replace(d.internalRep, '\n', '') AS htmlRep,
        concat(s.name, ' ', s.year) AS source
 FROM Definition d
 JOIN Source s ON d.sourceId = s.id
