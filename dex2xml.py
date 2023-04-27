@@ -4,7 +4,7 @@
 # DEX2XML
 # =======
 #
-# dex2xml is aPython script to convert DEXonline database to xml format for creating a MOBI dictionary.
+# dex2xml is a Python script to convert DEXonline database to xml format for creating a MOBI dictionary.
 #
 # Due to Kindle fonts, the diacritics for Romanian language are not displayed properly
 # (Romanian standard defines diacritics as letters with comma (, ) and Kindle displays these with cedilla)
@@ -20,7 +20,7 @@
 # * Linux or Windows enivronment
 # * MySQL server
 # * copy of DEXonline database - download and installation instructions: http://wiki.dexonline.ro/wiki/Instruc%C8%9Biuni_de_instalare
-# * Python (this script was created and tested using Python 2.7)
+# * Python (this script was tested using Python 3.10)
 # * PyMySql package (compiled from sources or installed using "pip install pymysql")
 #
 # optional:
@@ -28,6 +28,9 @@
 #
 # Version history:
 # ----------------
+#     0.9.2
+#         updated to work with Python 3.10
+#
 #     0.9.1
 #         added parameter to select how the diacritics should be exported (comma, cedilla, both)
 #
@@ -236,7 +239,7 @@ def signal_handler(signal, frame):
 
     print('\n\nExport aborted!')
     if name:
-        response = raw_input("Do you want to delete the temporary files (%s*.html)? [Y/n]: " % name).lower()
+        response = input("Do you want to delete the temporary files (%s*.html)? [Y/n]: " % name).lower()
         if (response == 'y') or (response == 'yes'):
             if to:
                 to.close()
@@ -333,7 +336,7 @@ def deleteFiles(filemask, mobi):
 def deleteTemporaryFiles():
     response = 'n'
     if args.interactive:
-        response = raw_input("\nDo you want to delete the temporary files (%s*.html and %s.opf) [Y/n]?: " % (name, name)).lower() or 'y'
+        response = input("\nDo you want to delete the temporary files (%s*.html and %s.opf) [Y/n]?: " % (name, name)).lower() or 'y'
     if (args.temp_files) or ((response == 'y') or (response == 'yes')):
         deleteFiles(name, mobi=False)
         print("Done removing files.")
@@ -466,7 +469,7 @@ def kindlegen():
     response = 'n'
     try:
         subprocess.call(['kindlegen'], stdout=subprocess.PIPE)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             print('Kindlegen was not on your path; not generating .MOBI version...')
             print('You can download kindlegen for Linux/Windows/Mac from http://www.amazon.com/gp/feature.html?docId=1000765211')
@@ -476,7 +479,7 @@ def kindlegen():
             raise
 
     if args.interactive:
-        response = raw_input("\nKindlegen was found in your path.\nDo you want to launch it to convert the OPF to MOBI? [Y/n]: ") or 'y'
+        response = input("\nKindlegen was found in your path.\nDo you want to launch it to convert the OPF to MOBI? [Y/n]: ") or 'y'
     if (args.kindlegen) or ((response == 'y') or (response == 'yes')):
         if runKindlegen():
             deleteTemporaryFiles()
@@ -529,31 +532,31 @@ def interactiveMode():
     global source_list_count
     global to
 
-    mysql_server = raw_input('Enter the name/ip of the MySQL server [default: %s]: ' % 'localhost') or 'localhost'
+    mysql_server = input('Enter the name/ip of the MySQL server [default: %s]: ' % 'localhost') or 'localhost'
     print("Using '%s'" % mysql_server)
 
-    mysql_port = raw_input('Enter the port for the server [default: %s]: ' % 3306) or 3306
+    mysql_port = input('Enter the port for the server [default: %s]: ' % 3306) or 3306
     print("Using '%s'" % mysql_port)
 
-    mysql_user = raw_input('Enter the username for the MySQL server [default: %s]: ' % 'root') or 'root'
+    mysql_user = input('Enter the username for the MySQL server [default: %s]: ' % 'root') or 'root'
     print("Using '%s'" % mysql_user)
 
     mysql_passwd = getpass.getpass('Enter the password for the user %s: ' % mysql_user)
     print("Using '%s'" % ('*' * len(mysql_passwd)))
 
-    mysql_db = raw_input('DEXonline database name [default: %s]: ' % 'DEX') or 'DEX'
+    mysql_db = input('DEXonline database name [default: %s]: ' % 'dexonline') or 'dexonline'
     print("Using '%s'" % mysql_db)
 
-    name = raw_input("\nEnter the filename of the generated dictionary file.\nExisting files will be deleted.\nMay include path [default: '%s']: " % "DEXonline") or "DEXonline"
+    name = input("\nEnter the filename of the generated dictionary file.\nExisting files will be deleted.\nMay include path [default: '%s']: " % "DEXonline") or "DEXonline"
     print("Using '%s'" % name)
-    diacritics = (raw_input("\nSpecify how the diacritics should be exported [comma/cedilla/BOTH]: ") or "both").lower()
+    diacritics = (input("\nSpecify how the diacritics should be exported [comma/cedilla/BOTH]: ") or "both").lower()
     print("Diacritics will be exported using '%s'" % diacritics.upper())
 
     tryConnect()
 
     printSources()
 
-    response = raw_input("Do you want to change the default sources list ? [y/N]: ").lower()
+    response = input("Do you want to change the default sources list ? [y/N]: ").lower()
     if (response == 'y') or (response == 'yes'):
         source_list = []
         source_list_names = []
@@ -561,7 +564,7 @@ def interactiveMode():
         cur.execute("select id, concat(name, ' ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount from Source s where canDistribute = 1 order by id")
         for i in range(cur.rowcount):
             src = cur.fetchone()
-            response = raw_input('\nUse as a source (%s of %s) %s ? [y/N]: ' % (i + 1, cur.rowcount, src["source"].encode("utf-8"))).lower()
+            response = input('\nUse as a source (%s of %s) %s ? [y/N]: ' % (i + 1, cur.rowcount, src["source"].encode("utf-8"))).lower()
             if (response == 'y') or (response == 'yes'):
                 srcid = src["id"]
                 srcname = src["source"]
@@ -570,7 +573,7 @@ def interactiveMode():
                 source_list_names.append(srcname)
                 source_list_count.append(srccount)
 
-        response = raw_input("Continue [Y/n]: ").lower()
+        response = input("Continue [Y/n]: ").lower()
         if (response == 'n') or (response == 'no'):
             sys.exit()
     print
@@ -634,4 +637,4 @@ exportDictionaryFiles()
 kindlegen()
 
 if args.interactive:
-    raw_input("\nPress <ENTER> to exit...")
+    input("\nPress <ENTER> to exit...")

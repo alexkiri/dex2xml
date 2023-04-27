@@ -1,7 +1,7 @@
 DEX2XML
 =======
 
-dex2xml is aPython script to convert DEXonline database to xml format for creating a MOBI dictionary.
+dex2xml is a Python script to convert DEXonline database to xml format for creating a MOBI dictionary.
 
 Due to Kindle fonts, the diacritics for Romanian language are not displayed properly
 (Romanian standard defines diacritics as letters with comma (,) and Kindle displays these with cedilla)
@@ -17,7 +17,7 @@ Requirements:
 * Linux or Windows enivronment
 * MySQL server
 * copy of DEXonline database - download and installation instructions: http://wiki.dexonline.ro/wiki/Instruc%C8%9Biuni_de_instalare
-* Python (this script was created and tested using Python 2.7)
+* Python (this script was tested using Python 3.10)
 * PyMySql package (compiled from sources or installed using "pip install pymysql")
 
 optional:
@@ -71,6 +71,9 @@ Usage:
 
 Version history:
 ----------------
+    0.9.2
+        updated to work with Python 3.10
+
     0.9.1
         added parameter to select how the diacritics should be exported (comma, cedilla, both)
 
