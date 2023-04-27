@@ -73,6 +73,7 @@ Version history:
 ----------------
     0.9.2
         updated to work with Python 3.10
+        fixed A chapter not being generated correctly
 
     0.9.1
         added parameter to select how the diacritics should be exported (comma, cedilla, both)

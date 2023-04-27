@@ -30,6 +30,7 @@
 # ----------------
 #     0.9.2
 #         updated to work with Python 3.10
+#         fixed A chapter not being generated correctly
 #
 #     0.9.1
 #         added parameter to select how the diacritics should be exported (comma, cedilla, both)
@@ -399,6 +400,9 @@ ORDER BY d.lexicon ASC,
         dsrc = row["source"]
 
         if letter != dterm[0].upper():
+        angstromWorkaround = not (letter == "A" and dterm[0].upper() == "Å")
+
+        if letter != dterm[0].upper() and angstromWorkaround :
             letter = dterm[0].upper()
             if to:
                 to.write(FRAMESETTEMPLATEEND)
