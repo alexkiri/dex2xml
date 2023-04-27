@@ -15,7 +15,7 @@ This python script is based on tab2opf.py by Klokan Petr Pøidal (www.klokan.cz)
 Requirements:
 -------------
 * Linux or Windows enivronment
-* MySQL server
+* MySQL server 8.0+ (tested using version 8.0.33)
 * copy of DEXonline database - download and installation instructions: http://wiki.dexonline.ro/wiki/Instruc%C8%9Biuni_de_instalare
 * Python (this script was tested using Python 3.10)
 * PyMySql package (compiled from sources or installed using "pip install pymysql")
@@ -74,6 +74,8 @@ Version history:
     0.9.2
         updated to work with Python 3.10
         fixed A chapter not being generated correctly
+        added workaround for formatting definitions
+        added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
 
     0.9.1
         added parameter to select how the diacritics should be exported (comma, cedilla, both)

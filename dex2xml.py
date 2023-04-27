@@ -18,7 +18,7 @@
 # Requirements:
 # -------------
 # * Linux or Windows enivronment
-# * MySQL server
+# * MySQL server 8.0+ (tested using version 8.0.33)
 # * copy of DEXonline database - download and installation instructions: http://wiki.dexonline.ro/wiki/Instruc%C8%9Biuni_de_instalare
 # * Python (this script was tested using Python 3.10)
 # * PyMySql package (compiled from sources or installed using "pip install pymysql")
@@ -31,6 +31,8 @@
 #     0.9.2
 #         updated to work with Python 3.10
 #         fixed A chapter not being generated correctly
+#         added workaround for formatting definitions
+#         added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
 #
 #     0.9.1
 #         added parameter to select how the diacritics should be exported (comma, cedilla, both)
@@ -369,10 +371,36 @@ def exportDictionaryFiles():
 
     start_time = time.time()
     cur.execute("""
-SELECT d.id,
-       d.lexicon,
-       replace(d.internalRep, '\n', '') AS htmlRep,
-       concat(s.name, ' ', s.year) AS source
+SELECT 
+    d.id,
+    d.lexicon,
+    replace(
+    replace(
+    replace(
+    regexp_replace(
+	regexp_replace(
+	regexp_replace(
+    regexp_replace(
+    regexp_replace(
+    regexp_replace(
+    regexp_replace(
+    regexp_replace(
+    regexp_replace(
+        d.internalRep,
+    '@(.+?)@', '<b>$1</b>'),
+    '\\\$(.+?)\\\$', '<i>$1</i>'), 
+    '#+(.+?)#+', '$1'),
+    '%%(.+?)%%', '<b>$1</b>'),
+    '(.)_(\\\d)', '$1<sub>$2</sub>'),
+    '(.)_\\\{([^\\\}]*)\\\}', '$1<sub>$2</sub>'),
+    '(.)\\\^(\\\d)', '$1<sup>$2</sup>'),
+    '(.)\\\^\\\{([^\\\}]*)\\\}', '$1<sup>$2</sup>'),
+    '\\'([a-zA-ZáàäåăắâấÁÀÄÅĂẮÂẤçÇéèêÉÈÊíîî́ÍÎÎ́óöÓÖșȘțȚúüÚÜýÝ])', '<span style="text-decoration: underline;">$1</span>'),
+    ' - ', ' – '),
+    ' ** ', ' ♦ '),
+    ' * ', ' ◊ ') as htmlRep,
+    concat(s.name, ' ', s.year) AS source,
+    d.sourceId
 FROM Definition d
 JOIN Source s ON d.sourceId = s.id
 WHERE s.id IN (%s)
@@ -399,7 +427,12 @@ ORDER BY d.lexicon ASC,
         ddef = row["htmlRep"]
         dsrc = row["source"]
 
-        if letter != dterm[0].upper():
+        # almost all the definions from the "Mic dictionar mitologic greco-roman"
+        # are names of heroes / gods / places. This workaround displays the title
+        # with a capital letter
+        if row["sourceId"] == 36:
+            dterm = dterm.title()
+
         angstromWorkaround = not (letter == "A" and dterm[0].upper() == "Å")
 
         if letter != dterm[0].upper() and angstromWorkaround :
@@ -601,7 +634,7 @@ batchgroup.add_argument("-s", "--server", help="Specify the mysql server to conn
 batchgroup.add_argument("-p", "--port", help="Mysql server port.\nDefault: 3306", type=int, default=3306)
 batchgroup.add_argument("-u", "--username", help="Specify the username to connect to mysql server.\nDefault: 'root'", type=str, default="root")
 batchgroup.add_argument("-passwd", "--password", help="The password of the mysql server.", type=str, default='')
-batchgroup.add_argument("-d", "--database", help="DEX database on the mysql server.\nDefault: 'DEX'", type=str, default="DEX")
+batchgroup.add_argument("-d", "--database", help="dexonline database on the mysql server.\nDefault: 'dexonline'", type=str, default="dexonline")
 batchgroup.add_argument("-src", "--sources", help="List of dictionary sources to extract from database.\nMust contain the sources id's from the table 'sources'.\nIf some source doesn't exist or can't be distributed, it will be removed from the list.\nDefault: 27 36", nargs='+', type=str)
 batchgroup.add_argument("-o", "--outputfile", help="Filename of output file.\nMay include path.\nExisting files will be deleted first.\nDefault: 'DEXonline'", type=str, default="DEXonline")
 batchgroup.add_argument("--diacritics", help="Specify how the diacritics should be exported.\nDefault: 'both'", choices=['comma', 'cedilla', 'both'], type=str, default="both")
