@@ -11,14 +11,17 @@
 # Due to this problem, searching for terms containing diacritics with comma would not return any result.
 # This was overcome by exporting terms and inflected forms both with comma and with cedilla.
 #
-# Tested with Kindle Paperwhite 2013
+# Tested with Kindle Paperwhite 2013 and Kindle Keyboard 2010
 #
 # This python script is based on tab2opf.py by Klokan Petr Pøidal (www.klokan.cz)
+# The regexs for formatting definitions are adapted from:
+# https://github.com/dexonline/dexonline/blob/master/lib/Constant.php#L68
+# https://wiki.dexonline.ro/wiki/Ghidul_voluntarului
 #
 # Requirements:
 # -------------
 # * Linux or Windows enivronment
-# * MySQL server 8.0+ (tested using version 8.0.33)
+# * MySQL server
 # * copy of DEXonline database - download and installation instructions: http://wiki.dexonline.ro/wiki/Instruc%C8%9Biuni_de_instalare
 # * Python (this script was tested using Python 3.10)
 # * PyMySql package (compiled from sources or installed using "pip install pymysql")
@@ -31,7 +34,7 @@
 #     0.9.2
 #         updated to work with Python 3.10
 #         fixed A chapter not being generated correctly
-#         added workaround for formatting definitions
+#         implemented formatting for definitions
 #         added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
 #
 #     0.9.1
@@ -122,6 +125,7 @@ ReplacementsRegexDict = {
     r'(?<!\\)\^\{([^}]*)\}': '<sup>\\1</sup>',
     r'(?<!\\)_(\d)': '<sub>\\1</sub>',
     r'(?<!\\)_\{([^}]*)\}': '<sub>\\1</sub>',
+    r'(?<!\\)\'([a-zA-ZáàäåăắâấÁÀÄÅĂẮÂẤçÇéèêÉÈÊíîî́ÍÎÎ́óöÓÖșȘțȚúüÚÜýÝ])': '<span style="text-decoration: underline;">\\1</span>',
 }
 
 ReplacementsStringDict = {
@@ -130,7 +134,7 @@ ReplacementsStringDict = {
     ' * ': ' ◊ ',
     '\\%': '%',
     '\\$': '$',
-    '\\\'': '\''
+    '\\\'': '\'',
 }
 
 OPFTEMPLATEHEAD = u"""<?xml version="1.0" encoding="utf-8"?>
