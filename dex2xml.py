@@ -78,6 +78,7 @@
 
 
 import os
+import re
 import sys
 import glob
 import time
@@ -109,6 +110,28 @@ conn = ''
 cur = ''
 cur2 = ''
 to = ''
+
+ReplacementsRegexDict = {
+    r'▶(.*?)◀': '',
+    r'(?<!\\)##(.*?)(?<!\\)##': '\\1',
+    r'(?<!\\)#(.*?)(?<!\\)#': '\\1',
+    r'(?<!\\)%(.*?)(?<!\\)%': '\\1',
+    r'(?<!\\)@(.*?)(?<!\\)@': '<b>\\1</b>',
+    r'(?<!\\)\$(.*?)(?<!\\)\$': '<i>\\1</i>',
+    r'(?<!\\)\^(\d)': '<sup>\\1</sup>',
+    r'(?<!\\)\^\{([^}]*)\}': '<sup>\\1</sup>',
+    r'(?<!\\)_(\d)': '<sub>\\1</sub>',
+    r'(?<!\\)_\{([^}]*)\}': '<sub>\\1</sub>',
+}
+
+ReplacementsStringDict = {
+    ' - ': ' – ',
+    ' ** ': ' ♦ ',
+    ' * ': ' ◊ ',
+    '\\%': '%',
+    '\\$': '$',
+    '\\\'': '\''
+}
 
 OPFTEMPLATEHEAD = u"""<?xml version="1.0" encoding="utf-8"?>
 <package unique-identifier="uid">
@@ -309,6 +332,15 @@ WHERE d.id = %s
                 inflections.append(inflection)
     return inflections
 
+def formatDefinition(definition):
+    result = definition
+
+    for key in ReplacementsRegexDict:
+        result = re.sub(key, ReplacementsRegexDict[key], result)
+
+    for key in ReplacementsStringDict:
+        result = result.replace(key, ReplacementsStringDict[key])
+    return result
 
 def printTerm(iddef, termen, definition, source):
     global to
@@ -374,31 +406,7 @@ def exportDictionaryFiles():
 SELECT 
     d.id,
     d.lexicon,
-    replace(
-    replace(
-    replace(
-    regexp_replace(
-	regexp_replace(
-	regexp_replace(
-    regexp_replace(
-    regexp_replace(
-    regexp_replace(
-    regexp_replace(
-    regexp_replace(
-    regexp_replace(
-        d.internalRep,
-    '@(.+?)@', '<b>$1</b>'),
-    '\\\$(.+?)\\\$', '<i>$1</i>'), 
-    '#+(.+?)#+', '$1'),
-    '%%(.+?)%%', '<b>$1</b>'),
-    '(.)_(\\\d)', '$1<sub>$2</sub>'),
-    '(.)_\\\{([^\\\}]*)\\\}', '$1<sub>$2</sub>'),
-    '(.)\\\^(\\\d)', '$1<sup>$2</sup>'),
-    '(.)\\\^\\\{([^\\\}]*)\\\}', '$1<sup>$2</sup>'),
-    '\\'([a-zA-ZáàäåăắâấÁÀÄÅĂẮÂẤçÇéèêÉÈÊíîî́ÍÎÎ́óöÓÖșȘțȚúüÚÜýÝ])', '<span style="text-decoration: underline;">$1</span>'),
-    ' - ', ' – '),
-    ' ** ', ' ♦ '),
-    ' * ', ' ◊ ') as htmlRep,
+    d.internalRep,
     concat(s.name, ' ', s.year) AS source,
     d.sourceId
 FROM Definition d
@@ -424,7 +432,7 @@ ORDER BY d.lexicon ASC,
 
         did = row["id"]
         dterm = row["lexicon"]
-        ddef = row["htmlRep"]
+        ddef = formatDefinition(row["internalRep"])
         dsrc = row["source"]
 
         # almost all the definions from the "Mic dictionar mitologic greco-roman"
