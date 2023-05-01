@@ -116,8 +116,10 @@ to = ''
 
 ReplacementsRegexDict = {
     r'▶(.*?)◀': '',
+    r'(?<!\\)"([^"]*)"': '„\\1”',
     r'(?<!\\)##(.*?)(?<!\\)##': '\\1',
     r'(?<!\\)#(.*?)(?<!\\)#': '\\1',
+    r'(?<!\\)\{{2}(.*?)(?<![+])\}{2}': ' [Notă: \\1]',
     r'(?<!\\)%(.*?)(?<!\\)%': '\\1',
     r'(?<!\\)@(.*?)(?<!\\)@': '<b>\\1</b>',
     r'(?<!\\)\$(.*?)(?<!\\)\$': '<i>\\1</i>',
@@ -129,12 +131,12 @@ ReplacementsRegexDict = {
 }
 
 ReplacementsStringDict = {
-    ' - ': ' – ',
-    ' ** ': ' ♦ ',
-    ' * ': ' ◊ ',
+    ' - ': ' – ',  # U+2013
+    ' ** ': ' ♦ ', # U+2666
+    ' * ': ' ◊ ',  # U+25CA
+    '\\\'': '’',   # U+2019
     '\\%': '%',
     '\\$': '$',
-    '\\\'': '\'',
 }
 
 OPFTEMPLATEHEAD = u"""<?xml version="1.0" encoding="utf-8"?>
@@ -150,8 +152,8 @@ OPFTEMPLATEHEAD = u"""<?xml version="1.0" encoding="utf-8"?>
             <dc:Source>http://dexonline.ro</dc:Source>
             <dc:Type>dictionary</dc:Type>
             <dc:Date>%s</dc:Date>
-    </dc-metadata>
-    <x-metadata>
+        </dc-metadata>
+        <x-metadata>
             <output encoding="utf-8" content-type="text/x-oeb1-document"></output>
             <!-- That's how it's recognized as a dictionary: -->
             <DictionaryInLanguage>ro</DictionaryInLanguage>
@@ -227,10 +229,10 @@ IDXTEMPLATEEND = u"""
                      </idx:orth>
                 </h2>
                 %s
-                <hr>
+                <br>
                 <sup>Sursa: <i>%s</i></sup>
             </idx:entry>
-            <mbp:pagebreak/>"""
+            <hr>"""
 
 IDXINFTEMPLATEHEAD = u"""
                         <idx:infl>"""
