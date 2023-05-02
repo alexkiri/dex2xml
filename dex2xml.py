@@ -33,9 +33,10 @@
 # ----------------
 #     0.9.2
 #         updated to work with Python 3.10
-#         fixed A chapter not being generated correctly
+#         fixed "A" chapter not being generated correctly
 #         implemented formatting for definitions
 #         added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
+#         reworked page formatting, cleaned up templates
 #
 #     0.9.1
 #         added parameter to select how the diacritics should be exported (comma, cedilla, both)
@@ -96,7 +97,7 @@ from argparse import RawTextHelpFormatter
 import pymysql
 
 # VERSION
-VERSION = "0.9.1"
+VERSION = "0.9.2"
 
 source_list = ['22', '23', '26', '27', '36', '21', '35']
 source_list_names = []
@@ -117,8 +118,8 @@ to = ''
 ReplacementsRegexDict = {
     r'▶(.*?)◀': '',
     r'(?<!\\)"([^"]*)"': '„\\1”',
-    r'(?<!\\)##(.*?)(?<!\\)##': '\\1',
-    r'(?<!\\)#(.*?)(?<!\\)#': '\\1',
+    r'(?<!\\)##(.*?)(?<!\\)##': '<span class="abr">\\1</span>',
+    r'(?<!\\)#(.*?)(?<!\\)#': '<span class="abr">\\1</span>',
     r'(?<!\\)\{{2}(.*?)(?<![+])\}{2}': ' [Notă: \\1]',
     r'(?<!\\)%(.*?)(?<!\\)%': '\\1',
     r'(?<!\\)@(.*?)(?<!\\)@': '<b>\\1</b>',
@@ -127,7 +128,7 @@ ReplacementsRegexDict = {
     r'(?<!\\)\^\{([^}]*)\}': '<sup>\\1</sup>',
     r'(?<!\\)_(\d)': '<sub>\\1</sub>',
     r'(?<!\\)_\{([^}]*)\}': '<sub>\\1</sub>',
-    r'(?<!\\)\'([a-zA-ZáàäåăắâấÁÀÄÅĂẮÂẤçÇéèêÉÈÊíîî́ÍÎÎ́óöÓÖșȘțȚúüÚÜýÝ])': '<span style="text-decoration: underline;">\\1</span>',
+    r'(?<!\\)\'([a-zA-ZáàäåăắâấÁÀÄÅĂẮÂẤçÇéèêÉÈÊíîî́ÍÎÎ́óöÓÖșȘțȚúüÚÜýÝ])': '<span class="und">\\1</span>',
 }
 
 ReplacementsStringDict = {
@@ -209,6 +210,7 @@ TOCTEMPLATEEND = u"""
 
 FRAMESETTEMPLATEHEAD = u"""<html xmlns:math="http://exslt.org/math" xmlns:svg="http://www.w3.org/2000/svg" xmlns:tl="http://www.kreutzfeldt.de/tl" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cx="http://www.kreutzfeldt.de/mmc/cx" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mbp="http://www.kreutzfeldt.de/mmc/mbp" xmlns:mmc="http://www.kreutzfeldt.de/mmc/mmc" xmlns:idx="http://www.mobipocket.com/idx">
     <head>
+        <link href="stylesheet.css" rel="stylesheet" type="text/css"/>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     </head>
     <body>
@@ -222,26 +224,26 @@ FRAMESETTEMPLATEEND = u"""
 
 IDXTEMPLATEHEAD = u"""
             <idx:entry name="word" scriptable="yes">
-                <h2>
-                    <idx:orth>%s"""
+                <idx:orth value="%s">"""
 
 IDXTEMPLATEEND = u"""
-                     </idx:orth>
-                </h2>
-                %s
-                <br>
-                <sup>Sursa: <i>%s</i></sup>
+                </idx:orth>
+                <p class="def">
+                    %s
+                    <br>
+                    <sup>Sursa: <i>%s</i></sup>
+                </p>
             </idx:entry>
             <hr>"""
 
 IDXINFTEMPLATEHEAD = u"""
-                        <idx:infl>"""
+                    <idx:infl>"""
 
 IDXINFTEMPLATEEND = u"""
-                         </idx:infl>"""
+                    </idx:infl>"""
 
 IDXINFVALUETEMPLATE = u"""
-                                <idx:iform value="%s" exact="yes" />"""
+                        <idx:iform value="%s" exact="yes" />"""
 
 STATSTEMPLATEHEAD = u"""<html xmlns:math="http://exslt.org/math" xmlns:svg="http://www.w3.org/2000/svg" xmlns:tl="http://www.kreutzfeldt.de/tl" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cx="http://www.kreutzfeldt.de/mmc/cx" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mbp="http://www.kreutzfeldt.de/mmc/mbp" xmlns:mmc="http://www.kreutzfeldt.de/mmc/mmc" xmlns:idx="http://www.mobipocket.com/idx">
     <head>

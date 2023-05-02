@@ -76,9 +76,10 @@ Version history:
 ----------------
     0.9.2
         updated to work with Python 3.10
-        fixed A chapter not being generated correctly
+        fixed "A" chapter not being generated correctly
         implemented formatting for definitions
         added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
+        reworked page formatting, cleaned up templates
 
     0.9.1
         added parameter to select how the diacritics should be exported (comma, cedilla, both)
