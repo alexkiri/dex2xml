@@ -99,7 +99,14 @@ import pymysql
 # VERSION
 VERSION = "0.9.2"
 
-source_list = ['22', '23', '26', '27', '36', '21', '35']
+source_list = ['27', '40', '65', '36', '22']
+# source_list = ['12'] # DER
+# source_list = ['19'] # DOOM2
+# source_list = ['21', '55'] # MDN
+# source_list = ['26'] # Argou
+# source_list = ['53'] # MDA2
+# source_list = ['23'] # DLRLV
+# source_list = ['27', '40', '65', '36', '22', '23', '26'] # full
 source_list_names = []
 source_list_count = []
 inflection_map = {}
@@ -229,10 +236,14 @@ IDXTEMPLATEHEAD = u"""
 IDXTEMPLATEEND = u"""
                 </idx:orth>
                 <p class="def">
-                    %s
-                    <br>
-                    <sup>Sursa: <i>%s</i></sup>
+                    %s (<i>%s</i>)
                 </p>
+            </idx:entry>
+            <hr>"""
+
+IDXTEMPLATENOSOURCEEND = u"""
+                </idx:orth>
+                <p class="def">%s</p>
             </idx:entry>
             <hr>"""
 
@@ -321,7 +332,7 @@ JOIN EntryLexeme el ON el.lexemeId = l.id
 JOIN Entry e ON el.entryId = e.id
 JOIN EntryDefinition ed ON ed.entryId = e.id
 JOIN Definition d ON ed.definitionId = d.id
-WHERE d.id = %s
+WHERE d.id = %s AND el.main = 1
 """ % iddef)
 
     if cur2.rowcount > 0:
@@ -355,8 +366,12 @@ def printTerm(iddef, termen, definition, source):
 
     to.write(IDXTEMPLATEHEAD % (termen))
     printInflections(inflectionsList(iddef))
-    to.write(IDXTEMPLATEEND % (definition, source))
-
+    if len(source_list) <= 2:
+        # hide the source tags for single dictionary file
+        # and also for 2 similar dictionaries, such as MDN
+        to.write(IDXTEMPLATENOSOURCEEND % definition)
+    else:
+        to.write(IDXTEMPLATEEND % (definition, source))
 
 def deleteFile(filename):
     try:
@@ -415,7 +430,7 @@ SELECT
     d.id,
     d.lexicon,
     d.internalRep,
-    concat(s.name, ' ', s.year) AS source,
+    s.shortName AS source,
     d.sourceId
 FROM Definition d
 JOIN Source s ON d.sourceId = s.id
@@ -448,10 +463,11 @@ ORDER BY d.lexicon ASC,
         # with a capital letter
         if row["sourceId"] == 36:
             dterm = dterm.title()
+        
+        specialFirstLetters = ["A", "Ǻ", "Å", "Ă", "Â", "À", "Á"]
+        specialFirstLetterWorkaround = not (letter in specialFirstLetters and dterm[0].upper() in specialFirstLetters)
 
-        angstromWorkaround = not (letter == "A" and dterm[0].upper() == "Å")
-
-        if letter != dterm[0].upper() and angstromWorkaround :
+        if letter != dterm[0].upper() and specialFirstLetterWorkaround:
             letter = dterm[0].upper()
             if to:
                 to.write(FRAMESETTEMPLATEEND)
