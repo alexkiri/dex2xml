@@ -1,15 +1,23 @@
 name: Deploy
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
     inputs:
-      custom_command:
-        description: 'custom command'
-        default: ''
+      default_dict:
+        description: 'Generate the default dictionary'
+        default: true
         required: false
-        type: string
+        type: boolean
+      misc_dict:
+        description: 'Generate the misc dictionaries'
+        default: false
+        required: false
+        type: boolean
+      full_dict:
+        description: 'Generate the full dictionary'
+        default: false
+        required: false
+        type: boolean
 
 jobs:
   build:
@@ -21,16 +29,47 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: Install dependencies
+    - name: Setup and install dependencies
       run: |
+        mkdir db
+        sudo tar -xvzf kindlegen_linux_2.6_i386_v2_9.tar.gz -C /usr/bin/ kindlegen
         python -m pip install --upgrade pip
         pip install pymysql
-    - name: Checkout dexonline-docker
-      uses: actions/checkout@v4
+    - name: Cache database
+      uses: actions/cache@v3
+      id: db-cache
       with:
-        repository: david-batranu/dexonline-docker
-        path: 'dexonline-docker'
-    - name: Build the Docker image
-      run: docker build . --file ./dexonline-docker/Dockerfile --tag dexonline-docker:$(date +%s)
-    - name: Run custom command
-      run: ${{ inputs.custom_command }}
+        path: ./db/dex-database.sql.gz
+        key: dex-database
+        restore-keys: dex-database
+    - name: Download database
+      if: steps.db-cache.outputs.cache-hit != 'true'
+      run: wget -O ./db/dex-database.sql.gz https://dexonline.ro/static/download/dex-database.sql.gz -nv
+    - name: Setup database
+      run: |
+        sudo systemctl start mysql.service
+        mysql -e 'create database dexonline charset utf8mb4 collate utf8mb4_romanian_ci' -uroot -proot
+        zcat ./db/dex-database.sql.gz | mysql -uroot -proot dexonline
+        mysql -e "use dexonline; select id, shortName, concat(name, ', ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount, canDistribute from Source s order by id;" -uroot -proot
+    - name: Generate the default dictionary
+      if: ${{ inputs.default_dict == true }}
+      run: |
+        python dex2xml.py --batch --password root --sources 27 40 65 34 36 22 --outputfile "DEXonline"
+    - name: Generate the misc dictionaries
+      if: ${{ inputs.misc_dict == true }}
+      run: |
+        python dex2xml.py --batch --password root --sources 12 --outputfile "DEXonline DER"
+        python dex2xml.py --batch --password root --sources 19 --outputfile "DEXonline DOOM2"
+        python dex2xml.py --batch --password root --sources 21 55 --outputfile "DEXonline MDN"
+        python dex2xml.py --batch --password root --sources 26 --outputfile "DEXonline Argou"
+        python dex2xml.py --batch --password root --sources 53 --outputfile "DEXonline MDA2"
+        python dex2xml.py --batch --password root --sources 23 --outputfile "DEXonline DLRLV"
+    - name: Generate the full dictionary
+      if: ${{ inputs.full_dict == true }}
+      run: |
+        python dex2xml.py --batch --password root --sources 27 40 65 34 36 22 23 26 21 55 --outputfile "DEXonline full"
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dictionaries
+        path: '*.mobi'
