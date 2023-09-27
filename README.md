@@ -22,9 +22,11 @@ Requirements:
 * copy of DEXonline database - download and installation instructions: http://wiki.dexonline.ro/wiki/Instruc%C8%9Biuni_de_instalare
 * Python (this script was tested using Python 3.10)
 * PyMySql package (compiled from sources or installed using "pip install pymysql")
+* _optional_: kindlegen for generating MOBI format (available for Linux/Windows/Mac at http://www.amazon.com/gp/feature.html?docId=1000765211)
 
-optional:
-* kindlegen for generating MOBI format (available for Linux/Windows/Mac at http://www.amazon.com/gp/feature.html?docId=1000765211)
+Workflow:
+---------
+* The `Deploy` workflow from the Github Actions section of the repo can also be used to create the .mobi dictionary. This has the advantage of not requiring to install anything. You can find the generated file(s) in the "artifacts" section of a succesful build.
 
 Usage:
 ------
@@ -122,5 +124,3 @@ You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the
 Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
-
-
