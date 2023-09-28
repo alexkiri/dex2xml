@@ -40,11 +40,11 @@ jobs:
       id: db-cache
       with:
         path: ./db/dex-database.sql.gz
-        key: dex-database
-        restore-keys: dex-database
+        key: some-dex-database
+        restore-keys: some-dex-database
     - name: Download database
       if: steps.db-cache.outputs.cache-hit != 'true'
-      run: wget -O ./db/dex-database.sql.gz https://dexonline.ro/static/download/dex-database.sql.gz -nv
+      run: wget -O ./db/dex-database.sql.gz https://pixeldrain.com/u/e7MiBi9f -nv
     - name: Setup database
       run: |
         sudo systemctl start mysql.service
