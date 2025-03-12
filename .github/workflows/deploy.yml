@@ -44,7 +44,7 @@ jobs:
         restore-keys: some-dex-database
     - name: Download database
       if: steps.db-cache.outputs.cache-hit != 'true'
-      run: wget -O ./db/dex-database.sql.gz https://pixeldrain.com/u/e7MiBi9f -nv
+      run: wget -O dex-database.sql.gz "https://download.wetransfer.com/eugv/fc6d6a63f249a108373102926b6446cf20250312145517/97f3d3471bd04fdeb38c9399c43769b83849bb96/dex-database.sql.gz?cf=y&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRlZmF1bHQifQ.eyJleHAiOjE3NDE3OTIxNTYsImlhdCI6MTc0MTc5MTU1NiwiZG93bmxvYWRfaWQiOiJjNDBmODAxYS02ODgwLTQyMzgtYjQzMy0wMGY2MDdhMmY3NzUiLCJzdG9yYWdlX3NlcnZpY2UiOiJzdG9ybSJ9.dP49N3qfK-WuYLKG1c8feJgylR-4uuF2gpxGM3tbMO8" -nv
     - name: Setup database
       run: |
         sudo systemctl start mysql.service
