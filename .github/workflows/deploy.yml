@@ -54,7 +54,7 @@ jobs:
     - name: Generate the default dictionary
       if: ${{ inputs.default_dict == true }}
       run: |
-        python dex2xml.py --batch --password root --sources 27 40 65 34 36 22 --temp_files --outputfile "DEXonline"
+        python dex2xml.py --batch --password root --sources 27 40 65 22 --temp_files --outputfile "DEXonline"
     - name: Generate the misc dictionaries
       if: ${{ inputs.misc_dict == true }}
       run: |
