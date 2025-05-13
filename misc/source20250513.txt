@@ -1,0 +1,113 @@
+id	shortName	source	defcount	canDistribute
+1	DEX '98	Dicționarul explicativ al limbii române, ediția a II-a, 1998	60698	1
+2	DEX '96	Dicționarul explicativ al limbii române, ediția a II-a, 1996	4836	1
+3	DEX '84	Dicționarul explicativ al limbii române, 1984	30	1
+4	DEX '75	Dicționarul explicativ al limbii române, 1975	22	0
+5	DEX-S	Supliment la Dicționarul explicativ al limbii române, 1988	98	0
+6	Sinonime	Dicționar de sinonime, 2002	48769	0
+7	Antonime	Dicționar de antonime, 2002	4699	0
+8	Ortografic	Dicționar ortografic al limbii române, 2002	74752	0
+9	NODEX	Noul dicționar explicativ al limbii române, 2002	38731	0
+10	DAR	Dicționar de arhaisme și regionalisme, 2002	17960	0
+11	DGE	Dicționar gastronomic explicativ, 2003	276	0
+12	DER	Dicționarul etimologic român, 1958-1966	10147	0
+13	DLR	Dicționar al limbii române (Dicționarul Academiei), 1913-2010	9231	0
+14	DLRC	Dicționar al limbii române contemporane, 1980	133	0
+15	DLRM	Dicționarul limbii române moderne, 1958	11604	0
+16	DMLR	Dictionnaire morphologique de la langue roumaine, 1981	352	0
+17	DN	Dicționar de neologisme, 1986	48502	1
+18	DOOM	Dicționar ortografic, ortoepic și morfologic al limbii române, 1982	277	1
+19	DOOM 2	Dicționar ortografic, ortoepic și morfologic al limbii române, ediția a II-a revăzută și adăugită, 2005	61900	0
+20	MDA	Micul dicționar academic, 2002-2003	48	0
+21	MDN '00	Marele dicționar de neologisme, 2000	54004	0
+22	Neoficial	Definiții ale unor cuvinte care nu există în alte dicționare, 	0	1
+23	DLRLV	Dicționarul limbii române literare vechi (1640-1780) - Termeni regionali, 1987	2576	0
+24	DLRLC	Dicționarul limbii romîne literare contemporane, 1955-1957	49407	0
+25	DE	Dicționar enciclopedic, 1993-2009	29382	0
+26	Argou	Dicționar de argou al limbii române, 2007	8339	0
+27	DEX '09	Dicționarul explicativ al limbii române (ediția a II-a revăzută și adăugită), 2009	66964	1
+28	Petro-Sedim	Dicționar de termeni – Sedimentologie - Petrologie sedimentară - Sisteme depoziționale, 1999	934	0
+29	DSL	Dicționar General de Științe. Științe ale limbii, 2005	39	0
+30	DCR2	Dicționar de cuvinte recente, ediția a II-a, 1997	5807	0
+31	GTA	Glosar de termeni aviatici, 	947	0
+32	DTM	Dicționar de termeni muzicali, 2010	2834	0
+33	D.Religios	Dicționar religios, 1994	2082	0
+34	dexonline	Dicționar intern dexonline, 	347	0
+35	Scriban	Dicționaru limbii românești, 1939	42536	0
+36	Mitologic	Mic dicționar mitologic greco-roman, 1969	1941	0
+37	DEI	Dicționar enciclopedic ilustrat, 1999	13	0
+38	DOR	Marele dicționar ortografic al limbii române, 2008	1341	0
+39	DGL	Dicționar al greșelilor de limbă, 1982	17	0
+40	DEX '12	Dicționarul explicativ al limbii române (ediția a II-a revăzută și adăugită), 2012	21	1
+41	DRAM	Dicționar de regionalisme și arhaisme din Maramureș, 2011	3051	1
+42	Șăineanu, ed. VI	Dicționar universal al limbei române, ediția a VI-a, 1929	33317	0
+43	DTL	Dicționar de termeni lingvistici, 1998	1737	0
+44	DAS	Dicționar analogic și de sinonime al limbii române, 1978	612	0
+45	Șăineanu, ed. I	Dicționarul universal al limbei române (Șăineanu) - 1896, 1896	2	0
+46	DFLR	Dicționarul frazeologic al limbii române, 2009	19	0
+47	DS	Dicționar de sinonime, 1989	0	0
+48	DA	Dicționar de antonime, 1990	0	0
+49	DS5	Dicționar de sinonime, ediția a V-a, 1995	0	0
+50	DELR	Dicționar de expresii și locuțiuni românești, 1969	0	0
+51	DELLR	Dicționar de expresii și locuțiuni ale limbii române, 1985	0	0
+52	DMG	Dicționar de matematici generale, 1974	5	0
+53	MDA2	Micul dicționar academic, ediția a II-a, 2010	187684	0
+54	DELRIE	Dicționar etimologic al limbii române pe baza studiilor de indo-europenistică, 2008	5688	0
+55	MDN '08	Marele dicționar de neologisme (ediția a 10-a, revăzută, augmentată și actualizată), 2008	234	0
+56	DRAM 2015	Dicționar de regionalisme și arhaisme din Maramureș, ediția a doua, 2015	5290	0
+57	Onomastic	Dicționar Onomastic Romînesc, 1963	11678	0
+58	CADE	Dicționarul enciclopedic ilustrat, 1926-1931	13831	0
+59	Sinonime82	Dicționarul de sinonime al limbii române, 1982	46547	0
+60	DifSem	Dificultăți semantice, 1994	0	0
+61	GER	Etimologii romînești, 1963	7	0
+62	GAER	Alte etimologii românești, 1975	135	0
+63	DFL	Dicționar dendrofloricol, 1989	6603	0
+64	Etnobotanic	Dicționar etnobotanic, 1968	0	0
+65	DEX '16	Dicționarul explicativ al limbii române (ediția a II-a revăzută și adăugită), 2016	9	1
+66	DETS	Dicționar etimologic de termeni științifici, 1987	3738	0
+67	DEXI	Dicționar explicativ ilustrat al limbii române, 2007	9740	0
+68	DGS	Dicționar General de Sinonime al Limbii Române, 2013	2327	0
+69	DEXLRA	Dicționar explicativ al limbii române de azi, 2008	0	0
+70	Ortografic '01	Dicționar ortografic românesc, 2001	0	0
+71	Epitete	Dicționar de epitete (ediție revăzută), 2000	419	0
+72	DLRA	Dicționar al limbii române actuale (ediția a II-a revăzută și adăugită), 1998	3	0
+73	DASLR	Dicționar analogic și de sinonime al limbii române, 2009	328	0
+74	DFS	Dicționarul figurilor de stil, 1995	381	0
+75	DGSSL	Dicționar general de științe. Științe ale limbii, 1997	83	0
+76	DAN	Dicționarul Actualizat de Neologisme, 2013	2	0
+77	Legislație	Legislația României, 1989-2024	5	0
+78	psi	Dicționar de psihologie, 1978	1	0
+79	Enigmistică	Ghidul Enigmistului, 1977	1	0
+80	MDO	Mic Dicționar Ortografic, 1953	6586	0
+81	DEX-școlar	Dicționar explicativ școlar, 2008	29	0
+82	IVO-III	Îndreptar și vocabular ortografic (ediția a III-a, revăzută și completată), 1941	7262	1
+83	MEO	Mică Enciclopedie Onomastică, 1975	418	0
+84	DTLALL	Dicționar de termeni literari, 2013	1173	0
+85	DIN	Dicționar normativ al limbii române ortografic, ortoepic, morfologic și practic, 2009	0	0
+86	MDTL	Mic dicționar îndrumător în terminologia literară, 1979	431	0
+87	CECC	Dicționar de cuvinte, expresii, citate celebre, 1968	1212	0
+88	DOOM 3	Dicționar ortografic, ortoepic și morfologic al limbii române, ediția a III-a, 2021	65278	0
+89	DRAM 2021	Dicționar de regionalisme și arhaisme din Maramureș, ediția a treia, 2021	7255	0
+90	publicitate	publicitate, 	6	0
+91	expert	Dicționar de citate din experți, 	0	0
+92	DERC	Dicționar de expresii românești în contexte, 2015-2016	69	0
+93	DCR3	Dicționar de cuvinte recente, ediția a III-a, 2013	0	0
+101	DLR - tomul I	Dicționarul limbii române - tomul I (ediție anastatică), 2010	0	0
+102	DLR - tomul II	Dicționarul limbii române - tomul II (ediție anastatică), 2010	0	0
+103	DLR - tomul III	Dicționarul limbii române - tomul III (ediție anastatică), 2010	0	0
+104	DLR - tomul IV	Dicționarul limbii române - tomul IV (ediție anastatică), 2010	0	0
+105	DLR - tomul V	Dicționarul limbii române - tomul V (ediție anastatică), 2010	0	0
+106	DLR - tomul VI	Dicționarul limbii române - tomul VI (ediție anastatică), 2010	0	0
+107	DLR - tomul VII	Dicționarul limbii române - tomul VII (ediție anastatică), 2010	0	0
+108	DLR - tomul VIII	Dicționarul limbii române - tomul VIII (ediție anastatică), 2010	0	0
+109	DLR - tomul IX	Dicționarul limbii române - tomul IX (ediție anastatică), 2010	0	0
+110	DLR - tomul X	Dicționarul limbii române - tomul X - N–O (ediție anastatică), 2010	1256	0
+111	DLR - tomul XI	Dicționarul limbii române - tomul XI (ediție anastatică), 2010	0	0
+112	DLR - tomul XII	Dicționarul limbii române - tomul XII (ediție anastatică), 2010	0	0
+113	DLR - tomul XIII	Dicționarul limbii române - tomul XIII (ediție anastatică), 2010	0	0
+114	DLR - tomul XIV	Dicționarul limbii române - tomul XIV (ediție anastatică), 2010	0	0
+115	DLR - tomul XV	Dicționarul limbii române - tomul XV (ediție anastatică), 2010	0	0
+116	DLR - tomul XVI	Dicționarul limbii române - tomul XVI (ediție anastatică), 2010	0	0
+117	DLR - tomul XVII	Dicționarul limbii române - tomul XVII (ediție anastatică), 2010	0	0
+118	DLR - tomul XVIII	Dicționarul limbii române - tomul XVIII (ediție anastatică), 2010	0	0
+119	DLR - tomul XIX	Dicționarul limbii române - tomul XIX (ediție anastatică), 2010	0	0
