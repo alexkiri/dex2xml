@@ -3,17 +3,15 @@ DEX2XML
 
 dex2xml is a Python script to convert DEXonline database to xml format for creating a MOBI dictionary.
 
-Due to Kindle fonts, the diacritics for Romanian language are not displayed properly
-(Romanian standard defines diacritics as letters with comma (,) and Kindle displays these with cedilla)
-Due to this problem, searching for terms containing diacritics with comma would not return any result.
-This was overcome by exporting terms and inflected forms both with comma and with cedilla.
+Due to Kindle fonts, the diacritics for Romanian language are not displayed properly. (Romanian standard defines diacritics as letters with comma (,) and Kindle displays these with cedilla). Due to this problem, searching for terms containing diacritics with comma would not return any result. This was overcome by exporting terms and inflected forms both with comma and with cedilla.
 
 Tested with Kindle Paperwhite 2013 and Kindle Keyboard 2010
 
 This python script is based on tab2opf.py by Klokan Petr Pøidal (www.klokan.cz)
-The regexs for formatting definitions are adapted from:
-https://github.com/dexonline/dexonline/blob/master/lib/Constant.php#L68
-https://wiki.dexonline.ro/wiki/Ghidul_voluntarului
+
+The regular expressions used for formatting definitions are adapted from:
+- https://github.com/dexonline/dexonline/blob/master/lib/Constant.php#L68
+- https://wiki.dexonline.ro/wiki/Ghidul_voluntarului
 
 Requirements:
 -------------
@@ -76,37 +74,37 @@ Usage:
 
 Version history:
 ----------------
-    0.9.2
-        updated to work with Python 3.10
-        fixed "A" chapter not being generated correctly
-        implemented formatting for definitions
-        added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
-        reworked page formatting, cleaned up templates
+- 0.9.2
+  - updated to work with Python 3.10
+  - fixed "A" chapter not being generated correctly
+  - implemented formatting for definitions
+  - added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
+  - reworked page formatting, cleaned up templates
 
-    0.9.1
-        added parameter to select how the diacritics should be exported (comma, cedilla, both)
+- 0.9.1
+  - added parameter to select how the diacritics should be exported (comma, cedilla, both)
 
-    0.9.0
-        output file compliant with EPUB Publications 3.0 (http://www.idpf.org/epub/30/spec/epub30-publications.html)
-        added TOC
-        added abbreviation page
-        added full interactive mode
-        added full batch mode
-        added usage help
+- 0.9.0
+  - output file compliant with EPUB Publications 3.0 (http://www.idpf.org/epub/30/spec/epub30-publications.html)
+  - added TOC
+  - added abbreviation page
+  - added full interactive mode
+  - added full batch mode
+  - added usage help
 
-    0.2.2
-        various bugfixes and improvements
-        added posibility to directly run 'kindlegen' to convert the OPF to MOBI
+- 0.2.2
+  - various bugfixes and improvements
+  - added posibility to directly run 'kindlegen' to convert the OPF to MOBI
 
-    0.2.1
-        added parameters for connecting to MySql server
-        added posibility to choose the dictionary sources
+- 0.2.1
+  - added parameters for connecting to MySql server
+  - added posibility to choose the dictionary sources
 
-    0.2
-        initial dex2xml.py version
+- 0.2
+  - initial dex2xml.py version
 
-    0.1
-        initial version of tab2opf.py - Copyright (C) 2007 - Klokan Petr Pøidal (www.klokan.cz)
+- 0.1
+  - initial version of tab2opf.py - Copyright (C) 2007 - Klokan Petr Pøidal (www.klokan.cz)
 
 License
 -------
