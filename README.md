@@ -74,6 +74,10 @@ Usage:
 
 Version history:
 ----------------
+- 0.9.3
+  - workaround that adds variants of words with "î" instead of "â" as inflections, redirecting searches for older writing such as "gîndire" -> "gândire"
+  - remove dictionary sources with "canDistribute" 0 
+  - proper xmlns values, accrding to amazon specs
 - 0.9.2
   - updated to work with Python 3.10
   - fixed "A" chapter not being generated correctly
