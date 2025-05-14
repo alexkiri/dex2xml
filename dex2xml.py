@@ -311,14 +311,16 @@ def isWithComma(termen):
     else:
         return False
 
-
-def printInflections(inflections):
+def printInflections(termen, inflections):
+    if "â" in termen and len(termen) > 1:
+        to.write(IDXINFVALUETEMPLATE % termen.replace("â", "î"))
     if len(inflections) > 0:
         to.write(IDXINFTEMPLATEHEAD)
         for inflection in inflections:
             to.write(IDXINFVALUETEMPLATE % inflection)
+            if "â" in inflection and len(termen) > 1:
+                to.write(IDXINFVALUETEMPLATE % inflection.replace("â", "î"))
         to.write(IDXINFTEMPLATEEND)
-
 
 def inflectionsList(iddef):
     global cur2
@@ -365,7 +367,7 @@ def printTerm(iddef, termen, definition, source):
     global to
 
     to.write(IDXTEMPLATEHEAD % (termen))
-    printInflections(inflectionsList(iddef))
+    printInflections(termen, inflectionsList(iddef))
     if len(source_list) <= 2:
         # hide the source tags for single dictionary file
         # and also for 2 similar dictionaries, such as MDN
