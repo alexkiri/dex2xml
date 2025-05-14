@@ -145,6 +145,8 @@ ReplacementsStringDict = {
     '\\\'': '’',   # U+2019
     '\\%': '%',
     '\\$': '$',
+    '<': '&lt;',
+    '>': '&gt;',
 }
 
 OPFTEMPLATEHEAD = u"""<?xml version="1.0" encoding="utf-8"?>
@@ -234,14 +236,6 @@ IDXTEMPLATEHEAD = u"""
                 <idx:orth value="%s">"""
 
 IDXTEMPLATEEND = u"""
-                </idx:orth>
-                <p class="def">
-                    %s (<i>%s</i>)
-                </p>
-            </idx:entry>
-            <hr>"""
-
-IDXTEMPLATENOSOURCEEND = u"""
                 </idx:orth>
                 <p class="def">%s</p>
             </idx:entry>
@@ -356,11 +350,12 @@ WHERE d.id = %s AND el.main = 1
 def formatDefinition(definition):
     result = definition
 
+    for key in ReplacementsStringDict:
+        result = result.replace(key, ReplacementsStringDict[key])
+
     for key in ReplacementsRegexDict:
         result = re.sub(key, ReplacementsRegexDict[key], result)
 
-    for key in ReplacementsStringDict:
-        result = result.replace(key, ReplacementsStringDict[key])
     return result
 
 def printTerm(iddef, termen, definition, source):
@@ -368,12 +363,13 @@ def printTerm(iddef, termen, definition, source):
 
     to.write(IDXTEMPLATEHEAD % (termen))
     printInflections(termen, inflectionsList(iddef))
-    if len(source_list) <= 2:
-        # hide the source tags for single dictionary file
-        # and also for 2 similar dictionaries, such as MDN
-        to.write(IDXTEMPLATENOSOURCEEND % definition)
-    else:
-        to.write(IDXTEMPLATEEND % (definition, source))
+
+    theDefinition = definition
+    if len(source_list) > 2:
+        # only show the source tags if multiple dictionary file
+        # hide for 1 or 2 similar dictionaries, such as MDN
+        theDefinition += " (<i>%s</i>)" % source
+    to.write(IDXTEMPLATEEND % theDefinition)
 
 def deleteFile(filename):
     try:
@@ -484,7 +480,7 @@ ORDER BY d.lexicon ASC,
                 spine = spine + '\t\t<itemref idref="' + letter + '"/>\n'
                 toc = toc + '\n\t\t\t\t\t\t<li><a href="' + to.name + '">' + letter + '</a></li>'
 
-        sys.stdout.write("\rExporting %s of %s..." % (i + 1, cur.rowcount))
+        sys.stdout.write("\rExporting \"%s\" %s of %s..." % (dterm, i + 1, cur.rowcount))
         # if the term contains comma it will export the term again but written with cedilla
         if isWithComma(dterm):
             if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
