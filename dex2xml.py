@@ -484,13 +484,14 @@ ORDER BY d.lexicon ASC,
 
         sys.stdout.write("\rExporting \"%s\" %s of %s..." % (dterm, i + 1, cur.rowcount))
         # if the term contains comma it will export the term again but written with cedilla
-        if isWithComma(dterm):
-            if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
-                printTerm(did, replaceWithCedilla(dterm), ddef, dsrc)
-            if (args.diacritics == 'comma') or (args.diacritics == 'both'):
-                printTerm(did, dterm, ddef, dsrc)
-        else:
-            printTerm(did, dterm, ddef, dsrc)
+        # if isWithComma(dterm):
+        #     if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
+        #         printTerm(did, replaceWithCedilla(dterm), ddef, dsrc, irep)
+        #     if (args.diacritics == 'comma') or (args.diacritics == 'both'):
+        #         printTerm(did, dterm, ddef, dsrc, irep)
+        # else:
+            # printTerm(did, dterm, ddef, dsrc, irep)
+        printTerm(did, dterm, ddef, dsrc, irep)
 
     end_time = time.time()
     print("\nExport time: %s" % time.strftime('%H:%M:%S', time.gmtime((end_time - start_time))))
