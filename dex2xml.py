@@ -368,7 +368,7 @@ def printTerm(iddef, termen, definition, source):
     if len(source_list) > 2:
         # only show the source tags if multiple dictionary file
         # hide for 1 or 2 similar dictionaries, such as MDN
-        theDefinition += " (<i>%s</i>)" % source
+        theDefinition += " <i>(%s)</i>" % source
     to.write(IDXTEMPLATEEND % theDefinition)
 
 def deleteFile(filename):
