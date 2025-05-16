@@ -238,7 +238,6 @@ IDXTEMPLATEHEAD = u"""
 IDXTEMPLATEEND = u"""
                 </idx:orth>
                 <p class="def">%s</p>
-                <pre>%s</pre>
             </idx:entry>
             <hr>"""
 
@@ -359,7 +358,7 @@ def formatDefinition(definition):
 
     return result
 
-def printTerm(iddef, termen, definition, source, irep):
+def printTerm(iddef, termen, definition, source):
     global to
 
     to.write(IDXTEMPLATEHEAD % (termen))
@@ -370,7 +369,7 @@ def printTerm(iddef, termen, definition, source, irep):
         # only show the source tags if multiple dictionary file
         # hide for 1 or 2 similar dictionaries, such as MDN
         theDefinition += " <i>(%s)</i>" % source
-    to.write(IDXTEMPLATEEND % (theDefinition, irep))
+    to.write(IDXTEMPLATEEND % theDefinition)
 
 def deleteFile(filename):
     try:
@@ -454,8 +453,7 @@ ORDER BY d.lexicon ASC,
 
         did = row["id"]
         dterm = row["lexicon"]
-        irep = row["internalRep"]
-        ddef = formatDefinition(irep)
+        ddef = formatDefinition(row["internalRep"])
         dsrc = row["source"]
 
         # almost all the definions from the "Mic dictionar mitologic greco-roman"
@@ -484,14 +482,13 @@ ORDER BY d.lexicon ASC,
 
         sys.stdout.write("\rExporting \"%s\" %s of %s..." % (dterm, i + 1, cur.rowcount))
         # if the term contains comma it will export the term again but written with cedilla
-        # if isWithComma(dterm):
-        #     if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
-        #         printTerm(did, replaceWithCedilla(dterm), ddef, dsrc, irep)
-        #     if (args.diacritics == 'comma') or (args.diacritics == 'both'):
-        #         printTerm(did, dterm, ddef, dsrc, irep)
-        # else:
-            # printTerm(did, dterm, ddef, dsrc, irep)
-        printTerm(did, dterm, ddef, dsrc, irep)
+        if isWithComma(dterm):
+            if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
+                printTerm(did, replaceWithCedilla(dterm), ddef, dsrc)
+            if (args.diacritics == 'comma') or (args.diacritics == 'both'):
+                printTerm(did, dterm, ddef, dsrc)
+        else:
+            printTerm(did, dterm, ddef, dsrc)
 
     end_time = time.time()
     print("\nExport time: %s" % time.strftime('%H:%M:%S', time.gmtime((end_time - start_time))))
