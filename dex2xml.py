@@ -128,7 +128,6 @@ ReplacementsRegexDict = {
     r'(?<!\\)##(.*?)(?<!\\)##': '<span class="abr">\\1</span>',
     r'(?<!\\)#(.*?)(?<!\\)#': '<span class="abr">\\1</span>',
     r'(?<!\\)\{{2}(.*?)(?<![+])\}{2}': ' [Notă: \\1]',
-    r'(?<!\\)%(.*?)(?<!\\)%': '\\1',
     r'(?<!\\)@(.*?)(?<!\\)@': '<b>\\1</b>',
     r'(?<!\\)\$(.*?)(?<!\\)\$': '<i>\\1</i>',
     r'(?<!\\)\^(\d)': '<sup>\\1</sup>',
@@ -136,17 +135,14 @@ ReplacementsRegexDict = {
     r'(?<!\\)_(\d)': '<sub>\\1</sub>',
     r'(?<!\\)_\{([^}]*)\}': '<sub>\\1</sub>',
     r'(?<!\\)\'([a-zA-ZáàäåăắâấÁÀÄÅĂẮÂẤçÇéèêÉÈÊíîî́ÍÎÎ́óöÓÖșȘțȚúüÚÜýÝ])': '<span class="und">\\1</span>',
-}
-
-ReplacementsStringDict = {
-    ' - ': ' – ',  # U+2013
-    ' ** ': ' ♦ ', # U+2666
-    ' * ': ' ◊ ',  # U+25CA
-    '\\\'': '’',   # U+2019
-    '\\%': '%',
-    '\\$': '$',
-    '<': '&lt;',
-    '>': '&gt;',
+    r' - ': ' – ',  # U+2013
+    r' \*\* ': ' ♦ ', # U+2666
+    r' \* ': ' ◊ ',  # U+25CA
+    r'\\\'': '’',   # U+2019
+    r'\\%': '%',
+    r'\\$': '$',
+    r'<': '&lt;',
+    r'>': '&gt;',
 }
 
 OPFTEMPLATEHEAD = u"""<?xml version="1.0" encoding="utf-8"?>
@@ -349,9 +345,6 @@ WHERE d.id = %s AND el.main = 1
 
 def formatDefinition(definition):
     result = definition
-
-    for key in ReplacementsStringDict:
-        result = result.replace(key, ReplacementsStringDict[key])
 
     for key in ReplacementsRegexDict:
         result = re.sub(key, ReplacementsRegexDict[key], result)
