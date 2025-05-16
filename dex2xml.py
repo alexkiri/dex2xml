@@ -238,6 +238,7 @@ IDXTEMPLATEHEAD = u"""
 IDXTEMPLATEEND = u"""
                 </idx:orth>
                 <p class="def">%s</p>
+                <pre>%s</pre>
             </idx:entry>
             <hr>"""
 
@@ -358,7 +359,7 @@ def formatDefinition(definition):
 
     return result
 
-def printTerm(iddef, termen, definition, source):
+def printTerm(iddef, termen, definition, source, irep):
     global to
 
     to.write(IDXTEMPLATEHEAD % (termen))
@@ -369,7 +370,7 @@ def printTerm(iddef, termen, definition, source):
         # only show the source tags if multiple dictionary file
         # hide for 1 or 2 similar dictionaries, such as MDN
         theDefinition += " <i>(%s)</i>" % source
-    to.write(IDXTEMPLATEEND % theDefinition)
+    to.write(IDXTEMPLATEEND % (theDefinition, irep))
 
 def deleteFile(filename):
     try:
@@ -453,7 +454,8 @@ ORDER BY d.lexicon ASC,
 
         did = row["id"]
         dterm = row["lexicon"]
-        ddef = formatDefinition(row["internalRep"])
+        irep = row["internalRep"]
+        ddef = formatDefinition(irep)
         dsrc = row["source"]
 
         # almost all the definions from the "Mic dictionar mitologic greco-roman"
