@@ -57,7 +57,7 @@ jobs:
       continue-on-error: true
       run: |
         sudo ls -l /var/lib/mysql
-        systemctl status mysql.service
+        # systemctl status mysql.service
         journalctl -xeu mysql.service
     - name: Download database and setup database
       if: steps.mysql-cache.outputs.cache-hit != 'true'
