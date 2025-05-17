@@ -25,10 +25,10 @@ jobs:
     steps:
     - name: Checkout dex2xml
       uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.11"
     - name: Setup and install dependencies
       run: |
         mkdir db
@@ -36,7 +36,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pymysql
     - name: Cache database
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: db-cache
       with:
         path: ./db/dex-database.sql.gz
@@ -50,6 +50,8 @@ jobs:
         sudo systemctl start mysql.service
         mysql -e 'create database dexonline charset utf8mb4 collate utf8mb4_romanian_ci' -uroot -proot
         zcat ./db/dex-database.sql.gz | mysql -uroot -proot dexonline
+    - name: Print database stats
+      run: |
         mysql -e "use dexonline; select id, shortName, concat(name, ', ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount, canDistribute from Source s order by id;" -uroot -proot
     - name: Generate the default dictionary
       if: ${{ inputs.default_dict == true }}
