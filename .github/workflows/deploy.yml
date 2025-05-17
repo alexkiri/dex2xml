@@ -35,19 +35,22 @@ jobs:
         sudo tar -xvzf kindlegen_linux_2.6_i386_v2_9.tar.gz -C /usr/bin/ kindlegen
         python -m pip install --upgrade pip
         pip install pymysql
-    - name: Cache database
+    - name: Cache MySQL Data Directory
+      id: mysql-cache
       uses: actions/cache@v4
-      id: db-cache
       with:
-        path: ./db/dex-database.sql.gz
-        key: dex-database
-        restore-keys: dex-database
-    - name: Download database
-      if: steps.db-cache.outputs.cache-hit != 'true'
-      run: wget -O ./db/dex-database.sql.gz https://dexonline.ro/static/download/dex-database.sql.gz -nv
-    - name: Setup database
+        path: /var/lib/mysql
+        key: mysql-data-cache
+        restore-keys: mysql-data-cache
+    - name: Restore MySQL permissions
+      if: steps.mysql-cache.outputs.cache-hit == 'true'
+      run: sudo chown -R mysql:mysql /var/lib/mysql
+    - name: Start MySQL
+      run: sudo systemctl start mysql.service
+    - name: Download database and setup database
+      if: steps.mysql-cache.outputs.cache-hit != 'true'
       run: |
-        sudo systemctl start mysql.service
+        wget -O ./db/dex-database.sql.gz https://dexonline.ro/static/download/dex-database.sql.gz -nv
         mysql -e 'create database dexonline charset utf8mb4 collate utf8mb4_romanian_ci' -uroot -proot
         zcat ./db/dex-database.sql.gz | mysql -uroot -proot dexonline
     - name: Print database stats
@@ -78,3 +81,7 @@ jobs:
         path: |
           *.*
           !db/*
+    - name: Stop MySQL
+      run: sudo systemctl stop mysql.service
+    - name: Fix MySQL permissions for caching
+      run: sudo chown -R $(whoami):$(whoami) /var/lib/mysql
