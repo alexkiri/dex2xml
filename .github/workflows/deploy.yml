@@ -35,6 +35,7 @@ jobs:
         sudo tar -xvzf kindlegen_linux_2.6_i386_v2_9.tar.gz -C /usr/bin/ kindlegen
         python -m pip install --upgrade pip
         pip install pymysql
+        sudo ls -l /var/lib/mysql
         sudo chown -R $(whoami):$(whoami) /var/lib/mysql
     - name: Cache MySQL Data Directory
       id: mysql-cache
@@ -48,6 +49,12 @@ jobs:
       run: sudo chown -R mysql:mysql /var/lib/mysql
     - name: Start MySQL
       run: sudo systemctl start mysql.service
+      continue-on-error: true
+    - name: logs
+      run: |
+        sudo ls -l /var/lib/mysql
+        systemctl status mysql.service
+        journalctl -xeu mysql.service
     - name: Download database and setup database
       if: steps.mysql-cache.outputs.cache-hit != 'true'
       run: |
