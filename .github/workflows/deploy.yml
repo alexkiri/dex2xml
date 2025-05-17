@@ -22,7 +22,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
     - name: Checkout dex2xml
       uses: actions/checkout@v4
@@ -47,12 +46,15 @@ jobs:
         restore-keys: mysql-data-cache
     - name: Restore MySQL permissions
       if: steps.mysql-cache.outputs.cache-hit == 'true'
+      continue-on-error: true
       run: |
         sudo ls -l /var/lib/mysql
         sudo chown -R mysql:mysql /var/lib/mysql
     - name: Start MySQL
       run: sudo systemctl start mysql
+      continue-on-error: true
     - name: logs
+      continue-on-error: true
       run: |
         sudo ls -l /var/lib/mysql
         systemctl status mysql.service
