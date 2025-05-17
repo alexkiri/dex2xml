@@ -40,7 +40,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ./db/dex-database.sql
-        key: dex-sql-${{ hashFiles('./db/dex-database.sql.gz') }}
+        key: dex-sql-uncompressed
     - name: Download & decompress SQL if not cached
       if: steps.cache-sql.outputs.cache-hit != 'true'
       run: |
@@ -51,6 +51,9 @@ jobs:
         sudo systemctl start mysql.service
         mysql -e 'create database dexonline charset utf8mb4 collate utf8mb4_romanian_ci' -uroot -proot
         mysql -uroot -proot dexonline < ./db/dex-database.sql
+        mysql -e "use dexonline; select id, shortName, concat(name, ', ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount, canDistribute from Source s order by id;" -uroot -proot
+    - name: Print database stats
+      run: |
         mysql -e "use dexonline; select id, shortName, concat(name, ', ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount, canDistribute from Source s order by id;" -uroot -proot
     - name: Generate the default dictionary
       if: ${{ inputs.default_dict == true }}
