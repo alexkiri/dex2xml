@@ -2,17 +2,19 @@ import re
 
 
 testStrings = [
-    "@CROMNÍCHEL@ #s. n.# Aliaj care conține 10-20\% crom, 60-70\% nichel, restul fier, folosit la construcția rezistențelor bobinate care lucrează la temperaturi înalte. - Din #germ.# @Chromnickel.@", 
-    "@AZOTOBACTÉR@ #subst.# #v.# @azotobacterie.@▶azobacterie→azotobacterie◀", 
-    "@ACĂT'ĂREA@ #adj.# #invar.# #v.# @acătării.@", 
-    "@ALÉM@ #s. n.# Steag cu însemnele Imperiului Otoman▶otoman→Otoman◀ (primit de domnii români la învestitura lor). - Din #tc.# @alem.@", 
-    "@ABITÁȚIE@ #s. f.# (#Jur.#) Drept de folosință a unei case de locuit care este proprietatea altuia. - Din #fr.# [droit d\']@habitation.@", 
-    "@ANGROSÍST, -Ă,@ $angrosiști, -ste,$ #s. m.# și #f.#, #adj.# (Persoană, întreprindere) care face comerț angro. - @Angro@ + #suf.# $-##ist.##$", 
-    "@NESCAFÉ^{®},@ (@2@) $nescafeuri,$ #s. n.# @1.@ Denumire comercială dată unui praf de cafea solubil, din care se prepară o băutură prin simpla dizolvare în apă; nes. @2.@ Sortiment sau porție de nescafe (@1@). - #Cuv.# #fr.#, <b>NESCAFÉ<sup>®</sup>,</b> (<b>2</b>) <i>nescafeuri,</i> s. n. <b>1.</b> Denumire comercială dată unui praf de cafea solubil, din care se prepară o băutură prin simpla dizolvare în apă; nes. <b>2.</b> Sortiment sau porție de nescafe (<b>1</b>). – Cuv. fr.", 
-    "@ACÉL^2, ACEÁ@ #pron. dem.# #v.# @acela^1.@	<b>ACÉL<sup>2</sup>, ACEÁ</b> pron. dem. v. <b>acela<sup>1</sup>.</b>", 
-    "@GUANÍNĂ,@ $guaníne,$ s. f. Purină ($C_5H_5N_5O$) care codează informația genetică în lanțul de polinucleotide al acidului dezoxiribonucleic sau al acidului ribonucleic. Cf. $adenină, citozină, timină$ și $uracil.$ (terminolog. științif., din $guano$ (unde se întâlnește cu precădere) + suf. $-ină$ (cf. $citozină$); cf. engl., fr. $guanine$) [$MW, TLF$]", 
-    "@ACIDITÁTE@ #s. f.# Grad de concentrație de ioni de hidrogen sau cantitatea totală de acid dintr-o soluție. ** Proprietatea de a fi acid. * $Aciditate gastrică$ = gradul de aciditate a sucului gastric, conferit de prezența acidului clorhidric, clorului, pepsinei și acidului lactic. - Din #fr.# @acidité,@ #lat.# @aciditas, -atis.@	<b>ACIDITÁTE</b> s. f. Grad de concentrație de ioni de hidrogen sau cantitatea totală de acid dintr-o soluție. ♦ Proprietatea de a fi acid. ◊ <i>Aciditate gastrică</i> = gradul de aciditate a sucului gastric, conferit de prezența acidului clorhidric, clorului, pepsinei și acidului lactic. – Din fr. <b>acidité,</b> lat. <b>aciditas, -atis.</b>", 
-    "@TOMÍSM@ #s. n.# Doctrină filosofică și teologică a lui Toma d\'Aquino și a continuatorilor săi. - Din #fr.# @thomisme.@", 
+    r"@CROMN'ICHEL@ #s. n.# Aliaj care conține 10-20\% crom, 60-70\% nichel, restul fier, folosit la construcția rezistențelor bobinate care lucrează la temperaturi înalte. - Din #germ.# @Chromnickel.@",
+    r"@AZOTOBACT'ER@ #subst.# #v.# @azotobacterie.@▶azobacterie→azotobacterie◀",
+    r"@ACĂT'ĂREA@ #adj.# #invar.# #v.# @acătării.@",
+    r"@AL'EM@ #s. n.# Steag cu însemnele Imperiului Otoman▶otoman→Otoman◀ (primit de domnii români la învestitura lor). - Din #tc.# @alem.@",
+    r"@ABIT'AȚIE@ #s. f.# (#Jur.#) Drept de folosință a unei case de locuit care este proprietatea altuia. - Din #fr.# [droit d\']@habitation.@",
+    r"@ANGROS'IST, -Ă,@ $angrosiști, -ste,$ #s. m.# și #f.#, #adj.# (Persoană, întreprindere) care face comerț angro. - @Angro@ + #suf.# $-##ist.##$",
+    r"@NESCAF'E^{®},@ (@2@) $nescafeuri,$ #s. n.# @1.@ Denumire comercială dată unui praf de cafea solubil, din care se prepară o băutură prin simpla dizolvare în apă; nes. @2.@ Sortiment sau porție de nescafe (@1@). - #Cuv.# #fr.#",
+    r"@AC'EL^2, ACE'A@ #pron. dem.# #v.# @acela^1.@",
+    r"@ALCH'ENĂ,@ $alchene,$ #s. f.# Nume dat unor hidrocarburi aciclice nesaturate. - Din #fr.# @alkène,@ #germ.# @Alkene.@{{E vorba de hidrocarburi care conțin o singură legătură nesaturată - de tipul -CH=CH- - și care au formula generală C_{n}H_{2n} cu n>1. (comentariu preluat din definiția cu sursa DEX \'98)/212}}",
+    r"@ACIDIT'ATE@ #s. f.# Grad de concentrație de ioni de hidrogen sau cantitatea totală de acid dintr-o soluție. ** Proprietatea de a fi acid. * $Aciditate gastrică$ = gradul de aciditate a sucului gastric, conferit de prezența acidului clorhidric, clorului, pepsinei și acidului lactic. - Din #fr.# @acidité,@ #lat.# @aciditas, -atis.@",
+    r"@TOM'ISM@ #s. n.# Doctrină filosofică și teologică a lui Toma d\'Aquino și a continuatorilor săi. - Din #fr.# @thomisme.@",
+    r"@SFECL'I,@ $sfeclesc,$ #vb.# IV. #Tranz.# (în #expr.#) $A o sfecli$ = a ajunge într-o situație neplăcută, a o păți; a o băga pe mânecă. - #Cf.# %sfeclă.%",
+    r"@SF'ECLĂ,@ $sfecle,$ #s. f.# Specie de plante erbacee cu frunze lucioase și cu rădăcina cărnoasă de culoare albă sau roșie, folosită ca aliment, ca plantă furajeră sau în industrie, pentru extragerea zahărului; nap $(Beta).$ * $Sfeclă de zahăr$ = plantă cu rădăcină cilindrică sau conică alungită și frunze mari, oval-alungite cu uri conținut de 14-22\% zahăr și utilizată în industria zahărului și a alcoolului $(Beta vulgaris-saccharifera). Sfeclă furajeră$ = plantă cu rădăcină voluminoasă ovală, cilindrică sau sferică, cu un conținut de 4-5\% zahăr, cultivată pentru hrana animalelor $(Beta vulgaris).$ - Din #sl.# @sveklŭ.@"
 ]
 
 ReplacementsRegexDict = {
@@ -49,3 +51,4 @@ def formatDefinition(definition):
 
 for definition in testStrings:
     print(formatDefinition(definition))
+    print("<hr>")
