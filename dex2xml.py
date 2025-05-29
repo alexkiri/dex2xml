@@ -359,9 +359,9 @@ def printTerm(iddef, termen, definition, source):
     printInflections(termen, inflectionsList(iddef))
 
     theDefinition = definition
-    if len(source_list) > 2:
+    if len(source_list) > 3:
         # only show the source tags if multiple dictionary file
-        # hide for 1 or 2 similar dictionaries, such as MDN
+        # hide for 1 - 3 similar dictionaries, such as DEX, MDN, etc
         theDefinition += " <i>(%s)</i>" % source
     to.write(IDXTEMPLATEEND % theDefinition)
 
