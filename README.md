@@ -28,87 +28,45 @@ Workflow:
 
 Usage:
 ------
+dex2xml.py [-h] [-v] [-r SERVER] [-c PORT] [-u USERNAME] [-p PASSWORD]
+                  [-d DATABASE] [-s SOURCES [SOURCES ...]] [-o OUTPUTFILE]
+                  [--diacritics {comma,cedilla,both}] [-k | -t]
 
-    dex2xml.py (-i | -b | -h | -v) [-s SERVER] [-p PORT] [-u USERNAME]
-                [-passwd PASSWORD] [-d DATABASE]
-                [-src SOURCES [SOURCES ...]] [-o OUTPUTFILE]
-                [--diacritics {comma,cedilla,both}] [-k | -t]
+options:
+  -h, --help            print this help file
+  -v, --version         print the program's version
 
-    optional arguments:
-    -i, --interactive     run the program in interactive mode
-    -b, --batch           run the program in batch mode, taking parameters from command line
-    -h, --help            print this help file
-    -v, --version         print the program's version
-
-    Batch arguments:
-    -s SERVER, --server SERVER
+Batch arguments:
+  -r SERVER, --server SERVER
                         Specify the mysql server to connect to.
                         Default: 'localhost'
-    -p PORT, --port PORT  Mysql server port.
+  -c PORT, --port PORT  Mysql server port.
                         Default: 3306
-    -u USERNAME, --username USERNAME
+  -u USERNAME, --username USERNAME
                         Specify the username to connect to mysql server.
                         Default: 'root'
-    -passwd PASSWORD, --password PASSWORD
+  -p PASSWORD, --password PASSWORD
                         The password of the mysql server.
-    -d DATABASE, --database DATABASE
-                        DEX database on the mysql server.
-                        Default: 'DEX'
-    -src SOURCES [SOURCES ...], --sources SOURCES [SOURCES ...]
+  -d DATABASE, --database DATABASE
+                        dexonline database on the mysql server.
+                        Default: 'dexonline'
+  -s SOURCES [SOURCES ...], --sources SOURCES [SOURCES ...]
                         List of dictionary sources to extract from database.
                         Must contain the sources id's from the table 'sources'.
                         If some source doesn't exist or can't be distributed, it will be removed from the list.
                         Default: 27 36
-    -o OUTPUTFILE, --outputfile OUTPUTFILE
+  -o OUTPUTFILE, --outputfile OUTPUTFILE
                         Filename of output file.
                         May include path.
                         Existing files will be deleted first.
                         Default: 'DEXonline'
-    --diacritics {comma,cedilla,both}
+  --diacritics {comma,cedilla,both}
                         Specify how the diacritics should be exported.
                         Default: 'both'
-    -k, --kindlegen     Do not run kindlegen to convert the output to MOBI.
+  -k, --kindlegen       Do not run kindlegen to convert the output to MOBI.
                         Default: not set
-    -t, --temp_files    Keep the temporary files after running kindlegen.
+  -t, --temp_files      Keep the temporary files after running kindlegen.
                         Default: not set
-
-Version history:
-----------------
-- 0.9.3
-  - workaround that adds variants of words with "î" instead of "â" as inflections, redirecting searches for older writing such as "gîndire" -> "gândire"
-  - remove dictionary sources with "canDistribute" 0 
-  - proper xmlns values, accrding to amazon specs
-- 0.9.2
-  - updated to work with Python 3.10
-  - fixed "A" chapter not being generated correctly
-  - implemented formatting for definitions
-  - added workaround for displaying the titles from "Mic dictionar mitologic greco-roman"
-  - reworked page formatting, cleaned up templates
-
-- 0.9.1
-  - added parameter to select how the diacritics should be exported (comma, cedilla, both)
-
-- 0.9.0
-  - output file compliant with EPUB Publications 3.0 (http://www.idpf.org/epub/30/spec/epub30-publications.html)
-  - added TOC
-  - added abbreviation page
-  - added full interactive mode
-  - added full batch mode
-  - added usage help
-
-- 0.2.2
-  - various bugfixes and improvements
-  - added posibility to directly run 'kindlegen' to convert the OPF to MOBI
-
-- 0.2.1
-  - added parameters for connecting to MySql server
-  - added posibility to choose the dictionary sources
-
-- 0.2
-  - initial dex2xml.py version
-
-- 0.1
-  - initial version of tab2opf.py - Copyright (C) 2007 - Klokan Petr Pøidal (www.klokan.cz)
 
 License
 -------
