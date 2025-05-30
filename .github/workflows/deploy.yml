@@ -8,16 +8,10 @@ on:
         default: true
         required: false
         type: boolean
-      misc_dict:
-        description: 'Generate the misc dictionaries'
-        default: false
+      custom_dict:
+        description: 'Generate a dictionary with custom sources'
         required: false
-        type: boolean
-      full_dict:
-        description: 'Generate the full dictionary'
-        default: false
-        required: false
-        type: boolean
+        type: string
 
 jobs:
   build:
@@ -56,21 +50,11 @@ jobs:
     - name: Generate the default dictionary
       if: ${{ inputs.default_dict == true }}
       run: |
-        python dex2xml.py --batch --password root --sources 27 40 65 --outputfile "DEXonline 2025.05"
-        python dex2xml.py --batch --password root --sources 41 --outputfile "DEXonline DRAM"
-    - name: Generate the misc dictionaries
-      if: ${{ inputs.misc_dict == true }}
+        python dex2xml.py -p root -s 27 40 65 -o "DEXonline 2025.05"
+    - name: Generate the custom dictionary
+      if: ${{ inputs.custom_dict != '' }}
       run: |
-        python dex2xml.py --batch --password root --sources 12 --outputfile "DEXonline DER"
-        python dex2xml.py --batch --password root --sources 19 --outputfile "DEXonline DOOM2"
-        python dex2xml.py --batch --password root --sources 21 55 --outputfile "DEXonline MDN"
-        python dex2xml.py --batch --password root --sources 26 --outputfile "DEXonline Argou"
-        python dex2xml.py --batch --password root --sources 53 --outputfile "DEXonline MDA2"
-        python dex2xml.py --batch --password root --sources 23 --outputfile "DEXonline DLRLV"
-    - name: Generate the full dictionary
-      if: ${{ inputs.full_dict == true }}
-      run: |
-        python dex2xml.py --batch --password root --sources 27 40 65 34 36 22 23 26 21 55 --outputfile "DEXonline full"
+        python dex2xml.py -p root -s ${{ inputs.custom_dict }} -o "DEXonline custom"
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
