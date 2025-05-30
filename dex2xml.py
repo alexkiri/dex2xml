@@ -273,7 +273,47 @@ STATSTEMPLATEEND = u"""
     </body>
 </html>"""
 
+SQL_QUERY_INFLECTIONS = """
+SELECT DISTINCT inf.formUtf8General AS inflection
+FROM InflectedForm AS inf
+JOIN Lexeme l ON inf.lexemeId = l.id
+JOIN EntryLexeme el ON el.lexemeId = l.id
+JOIN Entry e ON el.entryId = e.id
+JOIN EntryDefinition ed ON ed.entryId = e.id
+JOIN Definition d ON ed.definitionId = d.id
+WHERE d.id = %s AND el.main = 1
+"""
 
+SQL_QUERY_DEFINITIONS = """
+SELECT
+    d.id,
+    d.lexicon,
+    d.internalRep,
+    s.shortName AS source,
+    d.sourceId
+FROM Definition d
+JOIN Source s ON d.sourceId = s.id
+WHERE s.id IN (%s)
+    AND d.lexicon <> ''
+    AND d.status = 0
+ORDER BY
+    d.lexicon ASC,
+    s.year DESC
+"""
+
+SQL_QUERY_SOURCES = """
+SELECT 
+    id,
+    concat(name, ' ', year) AS source,
+    (SELECT COUNT(lexicon) FROM Definition d
+        WHERE d.status = 0
+        AND d.sourceId = s.id)
+    AS defcount
+FROM Source s
+WHERE id IN (%s)
+    AND canDistribute = 1
+ORDER BY id
+"""
 def signal_handler(signal, frame):
     print('\n\nExport aborted!')
     if base_filename:
@@ -318,16 +358,7 @@ def printInflections(termen, inflections):
 def inflectionsList(iddef):
     inflections = []
 
-    cursor2.execute("""
-SELECT DISTINCT inf.formUtf8General AS inflection
-FROM InflectedForm AS inf
-JOIN Lexeme l ON inf.lexemeId = l.id
-JOIN EntryLexeme el ON el.lexemeId = l.id
-JOIN Entry e ON el.entryId = e.id
-JOIN EntryDefinition ed ON ed.entryId = e.id
-JOIN Definition d ON ed.definitionId = d.id
-WHERE d.id = %s AND el.main = 1
-""" % iddef)
+    cursor2.execute(SQL_QUERY_INFLECTIONS % iddef)
 
     if cursor2.rowcount > 0:
         for i in range(cursor2.rowcount):
@@ -406,20 +437,7 @@ def exportDictionaryFiles():
     global file_output
 
     start_time = time.time()
-    cursor1.execute("""
-SELECT 
-    d.id,
-    d.lexicon,
-    d.internalRep,
-    s.shortName AS source,
-    d.sourceId
-FROM Definition d
-JOIN Source s ON d.sourceId = s.id
-WHERE s.id IN (%s)
-    AND d.lexicon <> ''
-    AND d.status = 0
-ORDER BY d.lexicon ASC,
-         s.year DESC""" % ', '.join(source_list))
+    cursor1.execute(SQL_QUERY_DEFINITIONS % ', '.join(source_list))
 
     if cursor1.rowcount == 0:
         print("Managed to retrieve 0 definitions from dictionary...\nSomething was wrong...")
@@ -430,9 +448,6 @@ ORDER BY d.lexicon ASC,
     letter = ''
     toc = ''
     file_output = False
-
-    # lexfilename = name + '_' + 'lexems.txt'
-    # tolexems = codecs.open(lexfilename, "w", "utf-8")
 
     for i in range(cursor1.rowcount):
         row = cursor1.fetchone()
@@ -539,14 +554,14 @@ def printSources():
 
     source_list_count = []
     source_list_names = []
-    cursor1.execute("select id, concat(name, ' ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount from Source s where id in (%s) and canDistribute = 1 order by id" % ', '.join(source_list))
+    cursor1.execute(SQL_QUERY_SOURCES % ', '.join(source_list))
     print("\nSources of dictionaries for export:\n")
     for i in range(cursor1.rowcount):
         src = cursor1.fetchone()
         srcid = src["id"]
         srcname = src["source"]
         srccount = src["defcount"]
-        print('id:%s defcount:%s name:"%s"' % (srcid, srccount, srcname.encode("utf-8")))
+        print('id:%s defcount:%s name:"%s"' % (srcid, srccount, srcname))
         source_list_names.append(srcname)
         source_list_count.append(srccount)
     print('\n')
