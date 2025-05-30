@@ -96,7 +96,6 @@ from argparse import RawTextHelpFormatter
 
 import pymysql
 
-# VERSION
 VERSION = "0.9.2"
 
 source_list = ['27', '40', '65', '36', '22']
@@ -116,11 +115,10 @@ mysql_port = ''
 mysql_user = ''
 mysql_passwd = ''
 mysql_db = ''
-name = ''
-conn = ''
-cur = ''
-cur2 = ''
-to = ''
+base_filename = ''
+cursor1 = ''
+cursor2 = ''
+file_output = ''
 
 ReplacementsRegexDict = {
     r' - ': ' – ',  # U+2013
@@ -175,6 +173,8 @@ OPFTEMPLATEHEAD = u"""<?xml version="1.0" encoding="utf-8"?>
         <item id="abbr" href="Abrevieri.html" mediatype="text/html"/>
         <!-- list of all the files needed to produce the .prc file -->
 """
+OPFTEMPLATEMANIFEST = u"""
+        <item id="%s" href="%s" media-type="text/x-oeb1-document"/>"""
 
 OPFTEMPLATEMIDDLE = u"""    </manifest>
     <spine>
@@ -184,6 +184,9 @@ OPFTEMPLATEMIDDLE = u"""    </manifest>
         <itemref idref="abbr"/>
         <!-- list of the html files in the correct order  -->
 """
+
+OPFTEMPLATESPINE = u"""
+        <itemref idref="%s"/>"""
 
 OPFTEMPLATEEND = u"""   </spine>
     <guide>
@@ -201,15 +204,17 @@ TOCTEMPLATEHEAD = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </head>
     <body>
         <h4 style="text-align:center">Index</h4>
-        <hr>
-            <nav epub:type="toc" id="toc">
-                    <ol>
-                        <li><a href="%s.html">Statistici</a></li>
-                        <li><a href="Abrevieri.html">Abrevieri</a></li>"""
+        <hr />
+        <nav epub:type="toc" id="toc">
+            <ol>
+                <li><a href="%s.html">Statistici</a></li>
+                <li><a href="Abrevieri.html">Abrevieri</a></li>"""
+TOCTEMPLATEMIDDLE = u"""
+                <li><a href="%s">%s</a></li>"""
 
 TOCTEMPLATEEND = u"""
-                    </ol>
-            </nav>
+            </ol>
+        </nav>
     </body>
 </html>
 """
@@ -236,7 +241,7 @@ IDXTEMPLATEEND = u"""
                 </idx:orth>
                 <p class="def">%s</p>
             </idx:entry>
-            <hr>"""
+            <hr />"""
 
 IDXINFTEMPLATEHEAD = u"""
                     <idx:infl>"""
@@ -254,7 +259,7 @@ STATSTEMPLATEHEAD = u"""<html xmlns:math="http://exslt.org/math" xmlns:svg="http
     </head>
     <body>
         <p><h4 style="text-align:center">Prezenta versiune conține %s definiții din următoarele surse:</h4></p>
-        <br>
+        <br />
         <ul>
 """
 
@@ -263,23 +268,20 @@ STATSVALUETEMPLATE = u"""
 
 STATSTEMPLATEEND = u"""
         </ul>
-        <br>
+        <br />
         <h4 style="text-align:center">Generat: %s</h4>
     </body>
 </html>"""
 
 
 def signal_handler(signal, frame):
-    global name
-    global to
-
     print('\n\nExport aborted!')
-    if name:
-        response = input("Do you want to delete the temporary files (%s*.html)? [Y/n]: " % name).lower()
+    if base_filename:
+        response = input("Do you want to delete the temporary files (%s*.html)? [Y/n]: " % base_filename).lower()
         if (response == 'y') or (response == 'yes'):
-            if to:
-                to.close()
-            deleteFiles(name, mobi=True)
+            if file_output:
+                file_output.close()
+            deleteFiles(base_filename, mobi=True)
     sys.exit(0)
 
 
@@ -304,20 +306,19 @@ def isWithComma(termen):
 
 def printInflections(termen, inflections):
     if "â" in termen and len(termen) > 1:
-        to.write(IDXINFVALUETEMPLATE % termen.replace("â", "î"))
+        file_output.write(IDXINFVALUETEMPLATE % termen.replace("â", "î"))
     if len(inflections) > 0:
-        to.write(IDXINFTEMPLATEHEAD)
+        file_output.write(IDXINFTEMPLATEHEAD)
         for inflection in inflections:
-            to.write(IDXINFVALUETEMPLATE % inflection)
+            file_output.write(IDXINFVALUETEMPLATE % inflection)
             if "â" in inflection and len(termen) > 1:
-                to.write(IDXINFVALUETEMPLATE % inflection.replace("â", "î"))
-        to.write(IDXINFTEMPLATEEND)
+                file_output.write(IDXINFVALUETEMPLATE % inflection.replace("â", "î"))
+        file_output.write(IDXINFTEMPLATEEND)
 
 def inflectionsList(iddef):
-    global cur2
     inflections = []
 
-    cur2.execute("""
+    cursor2.execute("""
 SELECT DISTINCT inf.formUtf8General AS inflection
 FROM InflectedForm AS inf
 JOIN Lexeme l ON inf.lexemeId = l.id
@@ -328,9 +329,9 @@ JOIN Definition d ON ed.definitionId = d.id
 WHERE d.id = %s AND el.main = 1
 """ % iddef)
 
-    if cur2.rowcount > 0:
-        for i in range(cur2.rowcount):
-            inf = cur2.fetchone()
+    if cursor2.rowcount > 0:
+        for i in range(cursor2.rowcount):
+            inf = cursor2.fetchone()
             inflection = inf["inflection"]
             if inflection_map.get(inflection):
                 continue
@@ -353,9 +354,7 @@ def formatDefinition(definition):
     return result
 
 def printTerm(iddef, termen, definition, source):
-    global to
-
-    to.write(IDXTEMPLATEHEAD % (termen))
+    file_output.write(IDXTEMPLATEHEAD % (termen))
     printInflections(termen, inflectionsList(iddef))
 
     theDefinition = definition
@@ -363,7 +362,7 @@ def printTerm(iddef, termen, definition, source):
         # only show the source tags if multiple dictionary file
         # hide for 1 - 3 similar dictionaries, such as DEX, MDN, etc
         theDefinition += " <i>(%s)</i>" % source
-    to.write(IDXTEMPLATEEND % theDefinition)
+    file_output.write(IDXTEMPLATEEND % theDefinition)
 
 def deleteFile(filename):
     try:
@@ -386,38 +385,31 @@ def deleteFiles(filemask, mobi):
 def deleteTemporaryFiles():
     response = 'n'
     if args.interactive:
-        response = input("\nDo you want to delete the temporary files (%s*.html and %s.opf) [Y/n]?: " % (name, name)).lower() or 'y'
+        response = input("\nDo you want to delete the temporary files (%s*.html and %s.opf) [Y/n]?: " % (base_filename, base_filename)).lower() or 'y'
     if (args.temp_files) or ((response == 'y') or (response == 'yes')):
-        deleteFiles(name, mobi=False)
+        deleteFiles(base_filename, mobi=False)
         print("Done removing files.")
 
 
 def tryConnect():
-    global mysql_server
-    global mysql_port
-    global mysql_user
-    global mysql_passwd
-    global mysql_db
-    global conn
-    global cur
-    global cur2
+    global cursor1
+    global cursor2
 
     try:
-        conn = pymysql.connect(host=mysql_server, port=mysql_port, user=mysql_user, passwd=mysql_passwd, db=mysql_db, charset='utf8')
+        mysql_connection = pymysql.connect(host=mysql_server, port=mysql_port, user=mysql_user, passwd=mysql_passwd, db=mysql_db, charset='utf8')
     except pymysql.OperationalError as e:
         print('\nGot error {!r}, errno is {}'.format(e, e.args[0]))
         print("\nCould not connect to MySQL server using the parameters you entered.\nPlease make sure that the server is running and try again...")
         sys.exit()
-    cur = conn.cursor(pymysql.cursors.DictCursor)
-    cur2 = conn.cursor(pymysql.cursors.DictCursor)
+    cursor1 = mysql_connection.cursor(pymysql.cursors.DictCursor)
+    cursor2 = mysql_connection.cursor(pymysql.cursors.DictCursor)
 
 
 def exportDictionaryFiles():
-    global to
-    global cur
+    global file_output
 
     start_time = time.time()
-    cur.execute("""
+    cursor1.execute("""
 SELECT 
     d.id,
     d.lexicon,
@@ -432,7 +424,7 @@ WHERE s.id IN (%s)
 ORDER BY d.lexicon ASC,
          s.year DESC""" % ', '.join(source_list))
 
-    if cur.rowcount == 0:
+    if cursor1.rowcount == 0:
         print("Managed to retrieve 0 definitions from dictionary...\nSomething was wrong...")
         sys.exit()
 
@@ -440,10 +432,13 @@ ORDER BY d.lexicon ASC,
     spine = ''
     letter = ''
     toc = ''
-    to = False
+    file_output = False
 
-    for i in range(cur.rowcount):
-        row = cur.fetchone()
+    # lexfilename = name + '_' + 'lexems.txt'
+    # tolexems = codecs.open(lexfilename, "w", "utf-8")
+
+    for i in range(cursor1.rowcount):
+        row = cursor1.fetchone()
 
         did = row["id"]
         dterm = row["lexicon"]
@@ -461,20 +456,20 @@ ORDER BY d.lexicon ASC,
 
         if letter != dterm[0].upper() and specialFirstLetterWorkaround:
             letter = dterm[0].upper()
-            if to:
-                to.write(FRAMESETTEMPLATEEND)
-                to.close()
-            filename = name + '_' + letter + '.html'
+            if file_output:
+                file_output.write(FRAMESETTEMPLATEEND)
+                file_output.close()
+            filename = base_filename + '_' + letter + '.html'
             if os.path.isfile(filename):
-                to = codecs.open(filename, "a", "utf-8")
+                file_output = codecs.open(filename, "a", "utf-8")
             else:
-                to = codecs.open(filename, "w", "utf-8")
-                to.write(FRAMESETTEMPLATEHEAD)
-                manifest = manifest + '\t\t<item id="' + letter + '" href="' + to.name + '" media-type="text/x-oeb1-document"/>\n'
-                spine = spine + '\t\t<itemref idref="' + letter + '"/>\n'
-                toc = toc + '\n\t\t\t\t\t\t<li><a href="' + to.name + '">' + letter + '</a></li>'
+                file_output = codecs.open(filename, "w", "utf-8")
+                file_output.write(FRAMESETTEMPLATEHEAD)
+                manifest = manifest + OPFTEMPLATEMANIFEST % (letter, file_output.name)
+                spine = spine + OPFTEMPLATESPINE % letter
+                toc = toc + TOCTEMPLATEMIDDLE % (file_output.name, letter)
 
-        sys.stdout.write("\rExporting \"%s\" %s of %s..." % (dterm, i + 1, cur.rowcount))
+        sys.stdout.write("\rExporting \"%s\" %s of %s..." % (dterm, i + 1, cursor1.rowcount))
         # if the term contains comma it will export the term again but written with cedilla
         if isWithComma(dterm):
             if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
@@ -487,36 +482,34 @@ ORDER BY d.lexicon ASC,
     end_time = time.time()
     print("\nExport time: %s" % time.strftime('%H:%M:%S', time.gmtime((end_time - start_time))))
 
-    if to:
-        to.write(FRAMESETTEMPLATEEND)
+    if file_output:
+        file_output.write(FRAMESETTEMPLATEEND)
+        file_output.close()
 
-    if to:
-        to.close()
+    generateStats(base_filename, cursor1.rowcount)
 
-    generateStats(name, cur.rowcount)
+    cursor1.close()
+    cursor2.close()
 
-    cur.close()
-    cur2.close()
+    file_output = codecs.open("%s.opf" % base_filename, "w", "utf-8")
+    file_output.write(OPFTEMPLATEHEAD % (base_filename, base_filename, time.strftime("%d/%m/%Y"), base_filename + '_TOC', base_filename + '_STATS'))
+    file_output.write(manifest)
+    file_output.write(OPFTEMPLATEMIDDLE)
+    file_output.write(spine)
+    file_output.write(OPFTEMPLATEEND % (base_filename + '_TOC'))
+    file_output.close()
 
-    to = codecs.open("%s.opf" % name, "w", "utf-8")
-    to.write(OPFTEMPLATEHEAD % (name, name, time.strftime("%d/%m/%Y"), name + '_TOC', name + '_STATS'))
-    to.write(manifest)
-    to.write(OPFTEMPLATEMIDDLE)
-    to.write(spine)
-    to.write(OPFTEMPLATEEND % (name + '_TOC'))
-    to.close()
-
-    to = codecs.open("%s_TOC.xhtml" % name, "w", "utf-8")
-    to.write(TOCTEMPLATEHEAD % (name + '_STATS'))
-    to.write(toc)
-    to.write(TOCTEMPLATEEND)
-    to.close()
+    file_output = codecs.open("%s_TOC.xhtml" % base_filename, "w", "utf-8")
+    file_output.write(TOCTEMPLATEHEAD % (base_filename + '_STATS'))
+    file_output.write(toc)
+    file_output.write(TOCTEMPLATEEND)
+    file_output.close()
 
 
 def runKindlegen():
     start_time = time.time()
-#   returncode = subprocess.call(['kindlegen', name + '.opf', '-verbose', '-dont_append_source', '-c2'])
-    returncode = subprocess.call(['kindlegen', name + '.opf', '-verbose', '-dont_append_source'])
+#   returncode = subprocess.call(['kindlegen', base_filename + '.opf', '-verbose', '-dont_append_source', '-c2'])
+    returncode = subprocess.call(['kindlegen', base_filename + '.opf', '-verbose', '-dont_append_source'])
     end_time = time.time()
     if returncode < 0:
         print("\nKindlegen failed with return code %s.\nTemporary files will not be deleted..." % returncode)
@@ -534,7 +527,7 @@ def kindlegen():
         if e.errno == errno.ENOENT:
             print('Kindlegen was not on your path; not generating .MOBI version...')
             print('You can download kindlegen for Linux/Windows/Mac from http://www.amazon.com/gp/feature.html?docId=1000765211')
-            print('and then run: <kindlegen "%s.opf"> to convert the file to MOBI format.' % name)
+            print('and then run: <kindlegen "%s.opf"> to convert the file to MOBI format.' % base_filename)
             return
         else:
             raise
@@ -547,17 +540,15 @@ def kindlegen():
 
 
 def printSources():
-    global cur
-    global source_list
     global source_list_names
     global source_list_count
 
     source_list_count = []
     source_list_names = []
-    cur.execute("select id, concat(name, ' ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount from Source s where id in (%s) and canDistribute = 1 order by id" % ', '.join(source_list))
+    cursor1.execute("select id, concat(name, ' ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount from Source s where id in (%s) and canDistribute = 1 order by id" % ', '.join(source_list))
     print("\nSources of dictionaries for export:\n")
-    for i in range(cur.rowcount):
-        src = cur.fetchone()
+    for i in range(cursor1.rowcount):
+        src = cursor1.fetchone()
         srcid = src["id"]
         srcname = src["source"]
         srccount = src["defcount"]
@@ -568,9 +559,6 @@ def printSources():
 
 
 def generateStats(filemask, nrdef):
-    global source_list_names
-    global source_list_count
-
     stats = codecs.open(filemask + "_STATS.html", "w", "utf-8")
     stats.write(STATSTEMPLATEHEAD % nrdef)
 
@@ -587,11 +575,11 @@ def interactiveMode():
     global mysql_user
     global mysql_passwd
     global mysql_db
-    global name
+    global base_filename
     global source_list
     global source_list_names
     global source_list_count
-    global to
+    global file_output
 
     mysql_server = input('Enter the name/ip of the MySQL server [default: %s]: ' % 'localhost') or 'localhost'
     print("Using '%s'" % mysql_server)
@@ -608,8 +596,8 @@ def interactiveMode():
     mysql_db = input('DEXonline database name [default: %s]: ' % 'dexonline') or 'dexonline'
     print("Using '%s'" % mysql_db)
 
-    name = input("\nEnter the filename of the generated dictionary file.\nExisting files will be deleted.\nMay include path [default: '%s']: " % "DEXonline") or "DEXonline"
-    print("Using '%s'" % name)
+    base_filename = input("\nEnter the filename of the generated dictionary file.\nExisting files will be deleted.\nMay include path [default: '%s']: " % "DEXonline") or "DEXonline"
+    print("Using '%s'" % base_filename)
     diacritics = (input("\nSpecify how the diacritics should be exported [comma/cedilla/BOTH]: ") or "both").lower()
     print("Diacritics will be exported using '%s'" % diacritics.upper())
 
@@ -622,10 +610,10 @@ def interactiveMode():
         source_list = []
         source_list_names = []
         source_list_count = []
-        cur.execute("select id, concat(name, ' ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount from Source s where canDistribute = 1 order by id")
-        for i in range(cur.rowcount):
-            src = cur.fetchone()
-            response = input('\nUse as a source (%s of %s) %s ? [y/N]: ' % (i + 1, cur.rowcount, src["source"].encode("utf-8"))).lower()
+        cursor1.execute("select id, concat(name, ' ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount from Source s where canDistribute = 1 order by id")
+        for i in range(cursor1.rowcount):
+            src = cursor1.fetchone()
+            response = input('\nUse as a source (%s of %s) %s ? [y/N]: ' % (i + 1, cursor1.rowcount, src["source"].encode("utf-8"))).lower()
             if (response == 'y') or (response == 'yes'):
                 srcid = src["id"]
                 srcname = src["source"]
@@ -679,7 +667,7 @@ else:
     mysql_user = args.username
     mysql_passwd = args.password
     mysql_db = args.database
-    name = args.outputfile
+    base_filename = args.outputfile
     if not args.temp_files:
         print("\nWill not remove temporary files after a (successful) conversion with kindlegen...")
     if not args.kindlegen:
@@ -693,7 +681,7 @@ else:
 
     printSources()
 
-deleteFiles(name, mobi=True)
+deleteFiles(base_filename, mobi=True)
 exportDictionaryFiles()
 kindlegen()
 
