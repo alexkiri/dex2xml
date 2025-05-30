@@ -383,10 +383,7 @@ def deleteFiles(filemask, mobi):
 
 
 def deleteTemporaryFiles():
-    response = 'n'
-    if args.interactive:
-        response = input("\nDo you want to delete the temporary files (%s*.html and %s.opf) [Y/n]?: " % (base_filename, base_filename)).lower() or 'y'
-    if (args.temp_files) or ((response == 'y') or (response == 'yes')):
+    if (args.temp_files):
         deleteFiles(base_filename, mobi=False)
         print("Done removing files.")
 
@@ -520,7 +517,6 @@ def runKindlegen():
 
 
 def kindlegen():
-    response = 'n'
     try:
         subprocess.call(['kindlegen'], stdout=subprocess.PIPE)
     except OSError as e:
@@ -532,9 +528,7 @@ def kindlegen():
         else:
             raise
 
-    if args.interactive:
-        response = input("\nKindlegen was found in your path.\nDo you want to launch it to convert the OPF to MOBI? [Y/n]: ") or 'y'
-    if (args.kindlegen) or ((response == 'y') or (response == 'yes')):
+    if (args.kindlegen):
         if runKindlegen():
             deleteTemporaryFiles()
 
@@ -568,65 +562,6 @@ def generateStats(filemask, nrdef):
     stats.write(STATSTEMPLATEEND % time.strftime("%d/%m/%Y"))
     stats.close
 
-
-def interactiveMode():
-    global mysql_server
-    global mysql_port
-    global mysql_user
-    global mysql_passwd
-    global mysql_db
-    global base_filename
-    global source_list
-    global source_list_names
-    global source_list_count
-    global file_output
-
-    mysql_server = input('Enter the name/ip of the MySQL server [default: %s]: ' % 'localhost') or 'localhost'
-    print("Using '%s'" % mysql_server)
-
-    mysql_port = input('Enter the port for the server [default: %s]: ' % 3306) or 3306
-    print("Using '%s'" % mysql_port)
-
-    mysql_user = input('Enter the username for the MySQL server [default: %s]: ' % 'root') or 'root'
-    print("Using '%s'" % mysql_user)
-
-    mysql_passwd = getpass.getpass('Enter the password for the user %s: ' % mysql_user)
-    print("Using '%s'" % ('*' * len(mysql_passwd)))
-
-    mysql_db = input('DEXonline database name [default: %s]: ' % 'dexonline') or 'dexonline'
-    print("Using '%s'" % mysql_db)
-
-    base_filename = input("\nEnter the filename of the generated dictionary file.\nExisting files will be deleted.\nMay include path [default: '%s']: " % "DEXonline") or "DEXonline"
-    print("Using '%s'" % base_filename)
-    diacritics = (input("\nSpecify how the diacritics should be exported [comma/cedilla/BOTH]: ") or "both").lower()
-    print("Diacritics will be exported using '%s'" % diacritics.upper())
-
-    tryConnect()
-
-    printSources()
-
-    response = input("Do you want to change the default sources list ? [y/N]: ").lower()
-    if (response == 'y') or (response == 'yes'):
-        source_list = []
-        source_list_names = []
-        source_list_count = []
-        cursor1.execute("select id, concat(name, ' ', year) as source, (select count(lexicon) from Definition d where d.status = 0 and d.sourceId = s.id) as defcount from Source s where canDistribute = 1 order by id")
-        for i in range(cursor1.rowcount):
-            src = cursor1.fetchone()
-            response = input('\nUse as a source (%s of %s) %s ? [y/N]: ' % (i + 1, cursor1.rowcount, src["source"].encode("utf-8"))).lower()
-            if (response == 'y') or (response == 'yes'):
-                srcid = src["id"]
-                srcname = src["source"]
-                srccount = src["defcount"]
-                source_list.append(str(srcid))
-                source_list_names.append(srcname)
-                source_list_count.append(srccount)
-
-        response = input("Continue [Y/n]: ").lower()
-        if (response == 'n') or (response == 'no'):
-            sys.exit()
-    print
-
 ################################################################
 # MAIN
 ################################################################
@@ -635,11 +570,8 @@ def interactiveMode():
 signal.signal(signal.SIGINT, signal_handler)
 
 parser = argparse.ArgumentParser(add_help=False, formatter_class=RawTextHelpFormatter)
-group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument("-i", "--interactive", help="run the program in interactive mode", action="store_true")
-group.add_argument("-b", "--batch", help="run the program in batch mode, taking parameters from command line", action="store_true")
-group.add_argument("-h", "--help", help="print this help file", action="help")
-group.add_argument("-v", "--version", help="print the program's version", action="version", version='%(prog)s ' + VERSION)
+parser.add_argument("-h", "--help", help="print this help file", action="help")
+parser.add_argument("-v", "--version", help="print the program's version", action="version", version='%(prog)s ' + VERSION)
 
 batchgroup = parser.add_argument_group("Batch arguments")
 batchgroup.add_argument("-s", "--server", help="Specify the mysql server to connect to.\nDefault: 'localhost'", type=str, default="localhost")
@@ -657,33 +589,25 @@ batchgroup2.add_argument("-t", "--temp_files", help="Keep the temporary files af
 
 args = parser.parse_args()
 
-if args.interactive:
-    args.kindlegen = False
+mysql_server = args.server
+mysql_port = args.port
+mysql_user = args.username
+mysql_passwd = args.password
+mysql_db = args.database
+base_filename = args.outputfile
+if not args.temp_files:
+    print("\nWill not remove temporary files after a (successful) conversion with kindlegen...")
+if not args.kindlegen:
+    print("\nWill not automatically try to run kindlegen after exporting the dictionary.\nTemporary files will be preserved...")
     args.temp_files = False
-    interactiveMode()
-else:
-    mysql_server = args.server
-    mysql_port = args.port
-    mysql_user = args.username
-    mysql_passwd = args.password
-    mysql_db = args.database
-    base_filename = args.outputfile
-    if not args.temp_files:
-        print("\nWill not remove temporary files after a (successful) conversion with kindlegen...")
-    if not args.kindlegen:
-        print("\nWill not automatically try to run kindlegen after exporting the dictionary.\nTemporary files will be preserved...")
-        args.temp_files = False
 
-    tryConnect()
-    print("\nSuccessfully connected to database '%s' on '%s:%d', using username '%s' and password '%s'..." % (mysql_db, mysql_server, mysql_port, mysql_user, '*' * len(mysql_passwd)))
-    if args.sources:
-        source_list = args.sources
+tryConnect()
+print("\nSuccessfully connected to database '%s' on '%s:%d', using username '%s' and password '%s'..." % (mysql_db, mysql_server, mysql_port, mysql_user, '*' * len(mysql_passwd)))
+if args.sources:
+    source_list = args.sources
 
-    printSources()
+printSources()
 
 deleteFiles(base_filename, mobi=True)
 exportDictionaryFiles()
 kindlegen()
-
-if args.interactive:
-    input("\nPress <ENTER> to exit...")
