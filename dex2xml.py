@@ -283,13 +283,11 @@ def isWithComma(termen):
         return False
 
 def printInflections(termen, inflections):
-    if "â" in termen and len(termen) > 1:
-        file_output.write(IDXINFVALUETEMPLATE % termen.replace("â", "î"))
     if len(inflections) > 0:
         file_output.write(IDXINFTEMPLATEHEAD)
         for inflection in inflections:
             file_output.write(IDXINFVALUETEMPLATE % inflection)
-            if "â" in inflection and len(termen) > 1:
+            if "â" in inflection and len(inflection) > 1:
                 file_output.write(IDXINFVALUETEMPLATE % inflection.replace("â", "î"))
         file_output.write(IDXINFTEMPLATEEND)
 
