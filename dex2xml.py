@@ -212,7 +212,7 @@ STATSTEMPLATEEND = u"""
 </html>"""
 
 SQL_QUERY_INFLECTIONS = """
-SELECT DISTINCT inf.formUtf8General AS inflection
+SELECT DISTINCT inf.formNoAccent AS inflection
 FROM InflectedForm AS inf
 JOIN Lexeme l ON inf.lexemeId = l.id
 JOIN EntryLexeme el ON el.lexemeId = l.id
