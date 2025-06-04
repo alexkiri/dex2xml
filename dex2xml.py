@@ -218,7 +218,9 @@ JOIN EntryLexeme el ON el.lexemeId = l.id
 JOIN Entry e ON el.entryId = e.id
 JOIN EntryDefinition ed ON ed.entryId = e.id
 JOIN Definition d ON ed.definitionId = d.id
-WHERE d.id = %s AND el.main = 1
+WHERE d.id = %s 
+    AND el.main = 1
+    AND inf.formNoAccent <> d.lexicon
 """
 
 SQL_QUERY_DEFINITIONS = """
@@ -285,8 +287,6 @@ def printInflections(termen, inflections):
     if len(inflections) > 0:
         file_output.write(IDXINFTEMPLATEHEAD)
         for inflection in inflections:
-            if inflection == termen:
-                continue
             file_output.write(IDXINFVALUETEMPLATE % inflection)
             if "â" in inflection and len(inflection) > 1:
                 file_output.write(IDXINFVALUETEMPLATE % inflection.replace("â", "î"))
