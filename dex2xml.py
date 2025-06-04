@@ -285,6 +285,8 @@ def printInflections(termen, inflections):
     if len(inflections) > 0:
         file_output.write(IDXINFTEMPLATEHEAD)
         for inflection in inflections:
+            if inflection == termen:
+                continue
             file_output.write(IDXINFVALUETEMPLATE % inflection)
             if "â" in inflection and len(inflection) > 1:
                 file_output.write(IDXINFVALUETEMPLATE % inflection.replace("â", "î"))
