@@ -12,6 +12,11 @@ on:
         description: 'Generate a dictionary with custom sources'
         required: false
         type: string
+      database_url:
+        description: 'The url of the dex-database.sql.gz file'
+        default: 'https://dexonline.ro/static/download/dex-database.sql.gz'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -38,7 +43,7 @@ jobs:
         restore-keys: dex-database
     - name: Download database
       if: steps.db-cache.outputs.cache-hit != 'true'
-      run: wget -O ./db/dex-database.sql.gz https://dexonline.ro/static/download/dex-database.sql.gz -nv
+      run: wget -O ./db/dex-database.sql.gz ${{ inputs.database_url }} -nv
     - name: Setup database
       run: |
         sudo systemctl start mysql.service
