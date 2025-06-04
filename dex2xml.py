@@ -46,7 +46,6 @@ source_list = ['27', '40', '65', '36', '22']
 # source_list = ['27', '40', '65', '36', '22', '23', '26', '21', '55'] # full
 source_list_names = []
 source_list_count = []
-inflection_map = {}
 
 mysql_server = ''
 mysql_port = ''
@@ -300,9 +299,6 @@ def inflectionsList(iddef):
         for i in range(cursor2.rowcount):
             inf = cursor2.fetchone()
             inflection = inf["inflection"]
-            if inflection_map.get(inflection):
-                continue
-            inflection_map[inflection] = True
             if isWithComma(inflection):
                 if (args.diacritics == 'cedilla') or (args.diacritics == 'both'):
                     inflections.append(replaceWithCedilla(inflection))

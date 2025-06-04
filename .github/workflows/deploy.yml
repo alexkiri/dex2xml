@@ -50,7 +50,7 @@ jobs:
     - name: Generate the default dictionary
       if: ${{ inputs.default_dict == true }}
       run: |
-        python dex2xml.py -p root -s 27 40 65 -o "DEXonline 2025.05"
+        python dex2xml.py -p root -s 27 40 65 -o "DEXonline 2025.06"
     - name: Generate the custom dictionary
       if: ${{ inputs.custom_dict != '' }}
       run: |
